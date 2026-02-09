@@ -1,73 +1,58 @@
 package com.example.bartexchangeai.controller;
 
 import com.example.bartexchangeai.dto.CategoryDto;
-import com.example.bartexchangeai.mapper.CategoryMapper;
-import com.example.bartexchangeai.model.offer.Category;
-import com.example.bartexchangeai.repository.CategoryRepository;
+import com.example.bartexchangeai.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
+@Tag(name = "Categories", description = "Category management API")
 public class CategoryController {
-    
-    private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
-    
+
+    private final CategoryService categoryService;
+
     @GetMapping
-    public List<CategoryDto> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        return categoryMapper.toDtoList(categories);
+    @Operation(summary = "Get all categories")
+    public Page<CategoryDto> getAllCategories(Pageable pageable) {
+        return categoryService.findAll(pageable);
     }
-    
+
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
-        Optional<Category> category = categoryRepository.findById(id);
-        return category.map(cat -> ResponseEntity.ok(categoryMapper.toDto(cat)))
-                      .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get category by ID")
+    public CategoryDto getCategoryById(@PathVariable Long id) {
+        return categoryService.findById(id);
     }
-    
+
     @GetMapping("/name/{name}")
-    public ResponseEntity<CategoryDto> getCategoryByName(@PathVariable String name) {
-        Optional<Category> category = categoryRepository.findByName(name);
-        return category.map(cat -> ResponseEntity.ok(categoryMapper.toDto(cat)))
-                      .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get category by name")
+    public CategoryDto getCategoryByName(@PathVariable String name) {
+        return categoryService.findByName(name);
     }
-    
+
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
-        if (categoryRepository.existsByName(categoryDto.getName())) {
-            return ResponseEntity.badRequest().build();
-        }
-        Category category = categoryMapper.toEntity(categoryDto);
-        Category savedCategory = categoryRepository.save(category);
-        return ResponseEntity.ok(categoryMapper.toDto(savedCategory));
+    @Operation(summary = "Create a new category")
+    public CategoryDto createCategory(@Valid @RequestBody CategoryDto categoryDto) {
+        return categoryService.create(categoryDto);
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDto categoryDetails) {
-        Optional<Category> optionalCategory = categoryRepository.findById(id);
-        if (optionalCategory.isPresent()) {
-            Category category = optionalCategory.get();
-            category.setName(categoryDetails.getName());
-            Category updatedCategory = categoryRepository.save(category);
-            return ResponseEntity.ok(categoryMapper.toDto(updatedCategory));
-        }
-        return ResponseEntity.notFound().build();
+    @Operation(summary = "Update an existing category")
+    public CategoryDto updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDto categoryDto) {
+        return categoryService.update(id, categoryDto);
     }
-    
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a category")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        if (categoryRepository.existsById(id)) {
-            categoryRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

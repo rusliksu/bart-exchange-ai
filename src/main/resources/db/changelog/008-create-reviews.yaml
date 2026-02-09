@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-reviews
+      author: ruslan
+      changes:
+        - createTable:
+            tableName: reviews
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rating
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: text
+              - column:
+                  name: reviewer_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reviewed_user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: exchange_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: reviews
+            baseColumnNames: reviewer_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_reviews_reviewer
+        - addForeignKeyConstraint:
+            baseTableName: reviews
+            baseColumnNames: reviewed_user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_reviews_reviewed_user
+        - addForeignKeyConstraint:
+            baseTableName: reviews
+            baseColumnNames: exchange_id
+            referencedTableName: exchanges
+            referencedColumnNames: id
+            constraintName: fk_reviews_exchange

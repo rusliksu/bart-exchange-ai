@@ -1,58 +1,60 @@
 package com.example.bartexchangeai.controller;
 
-import com.example.bartexchangeai.model.exchange.Message;
-import com.example.bartexchangeai.repository.MessageRepository;
+import com.example.bartexchangeai.dto.MessageDto;
+import com.example.bartexchangeai.service.MessageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@Tag(name = "Messages", description = "Message management API")
 public class MessageController {
-    
-    private final MessageRepository messageRepository;
-    
+
+    private final MessageService messageService;
+
     @GetMapping
-    public List<Message> getAllMessages() {
-        return messageRepository.findAll();
+    @Operation(summary = "Get all messages")
+    public Page<MessageDto> getAllMessages(Pageable pageable) {
+        return messageService.findAll(pageable);
     }
-    
+
     @GetMapping("/{id}")
-    public ResponseEntity<Message> getMessageById(@PathVariable Long id) {
-        Optional<Message> message = messageRepository.findById(id);
-        return message.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get message by ID")
+    public MessageDto getMessageById(@PathVariable Long id) {
+        return messageService.findById(id);
     }
-    
+
     @GetMapping("/exchange/{exchangeId}")
-    public List<Message> getMessagesByExchange(@PathVariable Long exchangeId) {
-        return messageRepository.findByExchangeIdOrderByTimestampAsc(exchangeId);
+    @Operation(summary = "Get messages by exchange ID")
+    public List<MessageDto> getMessagesByExchange(@PathVariable Long exchangeId) {
+        return messageService.findByExchangeId(exchangeId);
     }
-    
-    @GetMapping("/sender/{senderId}")  
-    public List<Message> getMessagesBySender(@PathVariable Long senderId) {
-        return messageRepository.findBySenderId(senderId);
+
+    @GetMapping("/sender/{senderId}")
+    @Operation(summary = "Get messages by sender ID")
+    public List<MessageDto> getMessagesBySender(@PathVariable Long senderId) {
+        return messageService.findBySenderId(senderId);
     }
-    
+
     @PostMapping
-    public ResponseEntity<Message> createMessage(@RequestBody Message message) {
-        if (message.getTimestamp() == null) {
-            message.setTimestamp(LocalDateTime.now());
-        }
-        Message savedMessage = messageRepository.save(message);
-        return ResponseEntity.ok(savedMessage);
+    @Operation(summary = "Send a new message")
+    public MessageDto createMessage(@Valid @RequestBody MessageDto messageDto) {
+        return messageService.create(messageDto);
     }
-    
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a message")
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
-        if (messageRepository.existsById(id)) {
-            messageRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        messageService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

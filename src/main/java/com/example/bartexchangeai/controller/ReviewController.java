@@ -1,85 +1,78 @@
 package com.example.bartexchangeai.controller;
 
-import com.example.bartexchangeai.model.user.Review;
-import com.example.bartexchangeai.repository.ReviewRepository;
+import com.example.bartexchangeai.dto.ReviewDto;
+import com.example.bartexchangeai.service.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
+@Tag(name = "Reviews", description = "Review management API")
 public class ReviewController {
-    
-    private final ReviewRepository reviewRepository;
-    
+
+    private final ReviewService reviewService;
+
     @GetMapping
-    public List<Review> getAllReviews() {
-        return reviewRepository.findAll();
+    @Operation(summary = "Get all reviews")
+    public Page<ReviewDto> getAllReviews(Pageable pageable) {
+        return reviewService.findAll(pageable);
     }
-    
+
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReviewById(@PathVariable Long id) {
-        Optional<Review> review = reviewRepository.findById(id);
-        return review.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get review by ID")
+    public ReviewDto getReviewById(@PathVariable Long id) {
+        return reviewService.findById(id);
     }
-    
+
     @GetMapping("/reviewer/{reviewerId}")
-    public List<Review> getReviewsByReviewer(@PathVariable Long reviewerId) {
-        return reviewRepository.findByReviewerId(reviewerId);
+    @Operation(summary = "Get reviews by reviewer ID")
+    public List<ReviewDto> getReviewsByReviewer(@PathVariable Long reviewerId) {
+        return reviewService.findByReviewerId(reviewerId);
     }
-    
+
     @GetMapping("/user/{userId}")
-    public List<Review> getReviewsForUser(@PathVariable Long userId) {
-        return reviewRepository.findByReviewedUserIdOrderByIdDesc(userId);
+    @Operation(summary = "Get reviews for a user")
+    public List<ReviewDto> getReviewsForUser(@PathVariable Long userId) {
+        return reviewService.findByReviewedUserId(userId);
     }
-    
+
     @GetMapping("/exchange/{exchangeId}")
-    public List<Review> getReviewsByExchange(@PathVariable Long exchangeId) {
-        return reviewRepository.findByExchangeId(exchangeId);
+    @Operation(summary = "Get reviews for an exchange")
+    public List<ReviewDto> getReviewsByExchange(@PathVariable Long exchangeId) {
+        return reviewService.findByExchangeId(exchangeId);
     }
-    
+
     @GetMapping("/user/{userId}/average")
-    public ResponseEntity<Double> getAverageRating(@PathVariable Long userId) {
-        Double averageRating = reviewRepository.findAverageRatingByReviewedUserId(userId);
-        return ResponseEntity.ok(averageRating != null ? averageRating : 0.0);
+    @Operation(summary = "Get average rating for a user")
+    public Double getAverageRating(@PathVariable Long userId) {
+        return reviewService.getAverageRating(userId);
     }
-    
+
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody Review review) {
-        // Check if review already exists for this exchange and reviewer
-        if (reviewRepository.existsByExchangeIdAndReviewerId(
-                review.getExchange().getId(), 
-                review.getReviewer().getId())) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        Review savedReview = reviewRepository.save(review);
-        return ResponseEntity.ok(savedReview);
+    @Operation(summary = "Create a new review")
+    public ReviewDto createReview(@Valid @RequestBody ReviewDto reviewDto) {
+        return reviewService.create(reviewDto);
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<Review> updateReview(@PathVariable Long id, @RequestBody Review reviewDetails) {
-        Optional<Review> optionalReview = reviewRepository.findById(id);
-        if (optionalReview.isPresent()) {
-            Review review = optionalReview.get();
-            review.setRating(reviewDetails.getRating());
-            review.setComment(reviewDetails.getComment());
-            Review updatedReview = reviewRepository.save(review);
-            return ResponseEntity.ok(updatedReview);
-        }
-        return ResponseEntity.notFound().build();
+    @Operation(summary = "Update a review")
+    public ReviewDto updateReview(@PathVariable Long id, @Valid @RequestBody ReviewDto reviewDto) {
+        return reviewService.update(id, reviewDto);
     }
-    
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a review")
     public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
-        if (reviewRepository.existsById(id)) {
-            reviewRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        reviewService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

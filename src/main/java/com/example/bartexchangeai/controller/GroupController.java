@@ -1,86 +1,72 @@
 package com.example.bartexchangeai.controller;
 
 import com.example.bartexchangeai.dto.GroupDto;
-import com.example.bartexchangeai.mapper.GroupMapper;
-import com.example.bartexchangeai.model.group.Group;
-import com.example.bartexchangeai.repository.GroupRepository;
+import com.example.bartexchangeai.service.GroupService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/groups")
 @RequiredArgsConstructor
+@Tag(name = "Groups", description = "Group management API")
 public class GroupController {
-    
-    private final GroupRepository groupRepository;
-    private final GroupMapper groupMapper;
-    
+
+    private final GroupService groupService;
+
     @GetMapping
-    public List<GroupDto> getAllGroups() {
-        List<Group> groups = groupRepository.findAll();
-        return groupMapper.toDtoList(groups);
+    @Operation(summary = "Get all groups")
+    public Page<GroupDto> getAllGroups(Pageable pageable) {
+        return groupService.findAll(pageable);
     }
-    
+
     @GetMapping("/{id}")
-    public ResponseEntity<GroupDto> getGroupById(@PathVariable Long id) {
-        Optional<Group> group = groupRepository.findById(id);
-        return group.map(grp -> ResponseEntity.ok(groupMapper.toDto(grp)))
-                   .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get group by ID")
+    public GroupDto getGroupById(@PathVariable Long id) {
+        return groupService.findById(id);
     }
-    
+
     @GetMapping("/name/{name}")
-    public ResponseEntity<GroupDto> getGroupByName(@PathVariable String name) {
-        Optional<Group> group = groupRepository.findByName(name);
-        return group.map(grp -> ResponseEntity.ok(groupMapper.toDto(grp)))
-                   .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get group by name")
+    public GroupDto getGroupByName(@PathVariable String name) {
+        return groupService.findByName(name);
     }
-    
+
     @GetMapping("/member/{userId}")
+    @Operation(summary = "Get groups by member user ID")
     public List<GroupDto> getGroupsByMember(@PathVariable Long userId) {
-        List<Group> groups = groupRepository.findByMemberId(userId);
-        return groupMapper.toDtoList(groups);
+        return groupService.findByMemberId(userId);
     }
-    
+
     @GetMapping("/search")
+    @Operation(summary = "Search groups by keyword")
     public List<GroupDto> searchGroups(@RequestParam String keyword) {
-        List<Group> groups = groupRepository.findByNameOrDescriptionContaining(keyword);
-        return groupMapper.toDtoList(groups);
+        return groupService.search(keyword);
     }
-    
+
     @PostMapping
-    public ResponseEntity<GroupDto> createGroup(@Valid @RequestBody GroupDto groupDto) {
-        if (groupRepository.existsByName(groupDto.getName())) {
-            return ResponseEntity.badRequest().build();
-        }
-        Group group = groupMapper.toEntity(groupDto);
-        Group savedGroup = groupRepository.save(group);
-        return ResponseEntity.ok(groupMapper.toDto(savedGroup));
+    @Operation(summary = "Create a new group")
+    public GroupDto createGroup(@Valid @RequestBody GroupDto groupDto) {
+        return groupService.create(groupDto);
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<GroupDto> updateGroup(@PathVariable Long id, @Valid @RequestBody GroupDto groupDetails) {
-        Optional<Group> optionalGroup = groupRepository.findById(id);
-        if (optionalGroup.isPresent()) {
-            Group group = optionalGroup.get();
-            group.setName(groupDetails.getName());
-            group.setDescription(groupDetails.getDescription());
-            Group updatedGroup = groupRepository.save(group);
-            return ResponseEntity.ok(groupMapper.toDto(updatedGroup));
-        }
-        return ResponseEntity.notFound().build();
+    @Operation(summary = "Update a group")
+    public GroupDto updateGroup(@PathVariable Long id, @Valid @RequestBody GroupDto groupDto) {
+        return groupService.update(id, groupDto);
     }
-    
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a group")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
-        if (groupRepository.existsById(id)) {
-            groupRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        groupService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

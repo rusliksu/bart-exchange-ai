@@ -34,6 +34,14 @@ public class User {
     
     @Column
     private Float rating;
+
+    @Column(nullable = false)
+    @JsonIgnore
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
