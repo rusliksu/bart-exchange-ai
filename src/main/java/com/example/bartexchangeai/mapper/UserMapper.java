@@ -31,6 +31,8 @@ public interface UserMapper {
     @Mapping(target = "groups", ignore = true)
     @Mapping(target = "initiatedExchanges", ignore = true)
     @Mapping(target = "participatedExchanges", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "role", ignore = true)
     User toEntity(UserDto userDto);
     
     /**

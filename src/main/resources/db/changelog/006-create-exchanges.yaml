@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-exchanges
+      author: ruslan
+      changes:
+        - createTable:
+            tableName: exchanges
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: initiator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: participant_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: offer_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: exchanges
+            baseColumnNames: initiator_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_exchanges_initiator
+        - addForeignKeyConstraint:
+            baseTableName: exchanges
+            baseColumnNames: participant_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_exchanges_participant
+        - addForeignKeyConstraint:
+            baseTableName: exchanges
+            baseColumnNames: offer_id
+            referencedTableName: offers
+            referencedColumnNames: id
+            constraintName: fk_exchanges_offer

@@ -1,97 +1,84 @@
 package com.example.bartexchangeai.controller;
 
-import com.example.bartexchangeai.model.offer.Offer;
-import com.example.bartexchangeai.repository.OfferRepository;
-import com.example.bartexchangeai.repository.UserRepository;
-import com.example.bartexchangeai.repository.CategoryRepository;
+import com.example.bartexchangeai.dto.OfferDto;
+import com.example.bartexchangeai.service.OfferService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
+@Tag(name = "Offers", description = "Offer management API")
 public class OfferController {
-    
-    private final OfferRepository offerRepository;
-    
-    private final UserRepository userRepository;
-    
-    private final CategoryRepository categoryRepository;
-    
+
+    private final OfferService offerService;
+
     @GetMapping
-    public List<Offer> getAllOffers() {
-        return offerRepository.findAll();
+    @Operation(summary = "Get all offers")
+    public Page<OfferDto> getAllOffers(Pageable pageable) {
+        return offerService.findAll(pageable);
     }
-    
+
     @GetMapping("/{id}")
-    public ResponseEntity<Offer> getOfferById(@PathVariable Long id) {
-        Optional<Offer> offer = offerRepository.findById(id);
-        return offer.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get offer by ID")
+    public OfferDto getOfferById(@PathVariable Long id) {
+        return offerService.findById(id);
     }
-    
+
     @GetMapping("/status/{status}")
-    public List<Offer> getOffersByStatus(@PathVariable String status) {
-        return offerRepository.findByStatus(status);
+    @Operation(summary = "Get offers by status")
+    public List<OfferDto> getOffersByStatus(@PathVariable String status) {
+        return offerService.findByStatus(status);
     }
-    
+
     @GetMapping("/user/{userId}")
-    public List<Offer> getOffersByUser(@PathVariable Long userId) {
-        return offerRepository.findByUserId(userId);
+    @Operation(summary = "Get offers by user ID")
+    public List<OfferDto> getOffersByUser(@PathVariable Long userId) {
+        return offerService.findByUserId(userId);
     }
-    
+
     @GetMapping("/category/{categoryId}")
-    public List<Offer> getOffersByCategory(@PathVariable Long categoryId) {
-        return offerRepository.findByCategoryId(categoryId);
+    @Operation(summary = "Get offers by category ID")
+    public List<OfferDto> getOffersByCategory(@PathVariable Long categoryId) {
+        return offerService.findByCategoryId(categoryId);
     }
-    
+
     @GetMapping("/search")
-    public List<Offer> searchOffers(@RequestParam String keyword) {
-        return offerRepository.findByTitleOrDescriptionContaining(keyword);
+    @Operation(summary = "Search offers by keyword")
+    public List<OfferDto> searchOffers(@RequestParam String keyword) {
+        return offerService.search(keyword);
     }
-    
+
     @GetMapping("/active")
-    public List<Offer> getActiveOffers() {
-        return offerRepository.findActiveOffersOrderByNewest();
+    @Operation(summary = "Get active offers sorted by newest")
+    public List<OfferDto> getActiveOffers() {
+        return offerService.findActive();
     }
-    
+
     @PostMapping
-    public ResponseEntity<Offer> createOffer(@RequestBody Offer offer) {
-        // Validate user and category exist
-        if (!userRepository.existsById(offer.getUser().getId()) || 
-            !categoryRepository.existsById(offer.getCategory().getId())) {
-            return ResponseEntity.badRequest().build();
-        }
-        Offer savedOffer = offerRepository.save(offer);
-        return ResponseEntity.ok(savedOffer);
+    @Operation(summary = "Create a new offer")
+    public OfferDto createOffer(@Valid @RequestBody OfferDto offerDto) {
+        return offerService.create(offerDto);
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<Offer> updateOffer(@PathVariable Long id, @RequestBody Offer offerDetails) {
-        Optional<Offer> optionalOffer = offerRepository.findById(id);
-        if (optionalOffer.isPresent()) {
-            Offer offer = optionalOffer.get();
-            offer.setTitle(offerDetails.getTitle());
-            offer.setDescription(offerDetails.getDescription());
-            offer.setStatus(offerDetails.getStatus());
-            if (offerDetails.getCategory() != null) {
-                offer.setCategory(offerDetails.getCategory());
-            }
-            Offer updatedOffer = offerRepository.save(offer);
-            return ResponseEntity.ok(updatedOffer);
-        }
-        return ResponseEntity.notFound().build();
+    @Operation(summary = "Update an existing offer")
+    public OfferDto updateOffer(@PathVariable Long id, @Valid @RequestBody OfferDto offerDto) {
+        return offerService.update(id, offerDto);
     }
-    
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete an offer")
     public ResponseEntity<Void> deleteOffer(@PathVariable Long id) {
-        if (offerRepository.existsById(id)) {
-            offerRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        offerService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
