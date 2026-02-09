@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BartExchangeAI - Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-exchange-alt"></i> BartExchangeAI
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="display-4 text-center mb-4">
+                    <i class="fas fa-exchange-alt text-primary"></i>
+                    Welcome to BartExchangeAI
+                </h1>
+                <p class="lead text-center mb-5">A modern barter exchange platform powered by AI</p>
+                
+                <div class="alert alert-success text-center">
+                    <h4><i class="fas fa-check-circle"></i> System Status: Online</h4>
+                    Application is running successfully with all components active!
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-link"></i> API Endpoints</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="/api/users" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-users"></i> /api/users - Get all users
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="/api/categories" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-tags"></i> /api/categories - Get categories
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="/api/offers" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-gift"></i> /api/offers - Get all offers
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="/api/exchanges" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-handshake"></i> /api/exchanges - Get exchanges
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-database"></i> Database Access</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Access H2 Database Console:</p>
+                        <a href="/h2-console" target="_blank" class="btn btn-success mb-3">
+                            <i class="fas fa-database"></i> Open H2 Console
+                        </a>
+                        
+                        <h6>Connection Settings:</h6>
+                        <div class="bg-light p-3 rounded">
+                            <strong>JDBC URL:</strong> <code>jdbc:h2:mem:testdb</code><br>
+                            <strong>Username:</strong> <code>sa</code><br>
+                            <strong>Password:</strong> <em>(empty)</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-chart-bar"></i> Sample Data Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-2">
+                                <div class="bg-primary text-white p-3 rounded">
+                                    <h4>3</h4>
+                                    <small>Users</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="bg-success text-white p-3 rounded">
+                                    <h4>4</h4>
+                                    <small>Categories</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="bg-warning text-white p-3 rounded">
+                                    <h4>5</h4>
+                                    <small>Offers</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="bg-info text-white p-3 rounded">
+                                    <h4>2</h4>
+                                    <small>Exchanges</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="bg-secondary text-white p-3 rounded">
+                                    <h4>3</h4>
+                                    <small>Messages</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="bg-danger text-white p-3 rounded">
+                                    <h4>2</h4>
+                                    <small>Reviews</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6>Sample Users:</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">alice</h6>
+                                            <p class="card-text">Rating: 4.5⭐</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">bob</h6>
+                                            <p class="card-text">Rating: 4.2⭐</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">charlie</h6>
+                                            <p class="card-text">Rating: 3.8⭐</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

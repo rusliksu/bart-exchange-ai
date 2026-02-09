@@ -1,0 +1,282 @@
+# Cursor Rules для общения на русском языке
+
+## Основные принципы общения
+- Всегда отвечай на русском языке
+- Объясняй технические концепции простым и понятным русским языком
+- Используй русские термины для объяснения кода и архитектуры
+- При необходимости приводи примеры на русском языке в комментариях
+
+## Язык кода
+- Весь код пиши на английском языке
+- Имена переменных, функций, классов - на английском
+- Комментарии в коде могут быть на русском для лучшего понимания
+- Документация и README файлы - на русском языке
+
+## Примеры комментариев на русском
+```java
+// Проверяем, существует ли пользователь в базе данных
+if (user != null) {
+    // Обновляем время последнего входа
+    user.setLastLogin(LocalDateTime.now());
+}
+
+/**
+ * Создает нового пользователя в системе
+ * 
+ * @param username имя пользователя (обязательно)
+ * @param email электронная почта (обязательно)
+ * @param password пароль (минимум 8 символов)
+ * @return созданный пользователь или null при ошибке
+ * @throws IllegalArgumentException если данные некорректны
+ */
+public User createUser(String username, String email, String password) {
+    // реализация
+}
+```
+
+## Структура проекта
+```
+com.example.projectname/
+├── controller/          # REST контроллеры
+├── service/             # бизнес-логика
+├── repository/          # доступ к данным
+├── model/               # сущности и DTO
+├── config/              # настройки приложения
+├── util/                # вспомогательные классы
+└── exception/           # пользовательские исключения
+```
+
+## Именование файлов
+- Классы: `UserController.java`, `OrderService.java`
+- Интерфейсы: `UserRepository.java`, `AuthService.java`
+- Перечисления: `OrderStatus.java`, `UserType.java`
+
+## Обработка ошибок
+
+### Исключения
+```java
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message);
+    }
+}
+
+// Использование
+if (user == null) {
+    throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
+}
+```
+
+### Логирование
+```java
+private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+// Информационные сообщения
+logger.info("Создан новый пользователь: {}", username);
+
+// Предупреждения
+logger.warn("Попытка входа с неверным паролем для пользователя: {}", username);
+
+// Ошибки
+logger.error("Ошибка при сохранении пользователя: {}", error.getMessage(), error);
+```
+
+## API и REST
+
+### Endpoints
+```java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        // реализация
+    }
+    
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        // реализация
+    }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        // реализация
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        // реализация
+    }
+}
+```
+
+## База данных
+
+### Именование таблиц и полей
+```sql
+-- Таблицы в единственном числе
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- Связующие таблицы
+CREATE TABLE order_items (
+    order_id BIGINT,
+    item_id BIGINT,
+    quantity INTEGER,
+    price DECIMAL(10,2)
+);
+```
+
+### Entity классы
+```java
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "username", nullable = false, length = 50)
+    private String username;
+    
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+    
+    // геттеры и сеттеры
+}
+```
+
+## Тестирование
+
+### Именование тестов
+```java
+@Test
+void shouldCreateUserWithValidData() {
+    // тест
+}
+
+@Test
+void shouldThrowExceptionWithInvalidEmail() {
+    // тест
+}
+
+@Test
+void shouldReturnListOfActiveUsers() {
+    // тест
+}
+```
+
+### Тестовые данные
+```java
+@BeforeEach
+void setUp() {
+    testUser = new User();
+    testUser.setUsername("test_user");
+    testUser.setEmail("test@example.com");
+}
+```
+
+## Конфигурация
+
+### application.properties
+```properties
+# Настройки базы данных
+spring.datasource.url=jdbc:postgresql://localhost:5432/database_name
+spring.datasource.username=database_user
+spring.datasource.password=database_password
+
+# Настройки приложения
+app.max.users.count=1000
+app.session.timeout.minutes=30
+app.upload.path=/uploads
+```
+
+## Git и коммиты
+
+### Сообщения коммитов на русском
+```
+feat: добавить функциональность регистрации пользователей
+fix: исправить ошибку валидации email
+docs: обновить документацию API
+refactor: переименовать методы для лучшей читаемости
+test: добавить тесты для сервиса аутентификации
+```
+
+## Безопасность
+
+### Валидация данных
+```java
+@NotNull(message = "Имя пользователя обязательно")
+@Size(min = 3, max = 50, message = "Имя пользователя должно быть от 3 до 50 символов")
+private String username;
+
+@Email(message = "Некорректный формат email")
+@NotNull(message = "Email обязателен")
+private String email;
+```
+
+### Шифрование паролей
+```java
+@Autowired
+private PasswordEncoder passwordEncoder;
+
+public void setPassword(String password) {
+    this.encodedPassword = passwordEncoder.encode(password);
+}
+```
+
+## Производительность
+
+### Кэширование
+```java
+@Cacheable("users")
+public User findByUsername(String username) {
+    return userRepository.findByUsername(username);
+}
+```
+
+### Пагинация
+```java
+@GetMapping
+public Page<User> getUsers(
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "20") int size) {
+    return userRepository.findAll(PageRequest.of(page, size));
+}
+```
+
+## Локализация
+
+### Сообщения
+```properties
+# messages_ru.properties
+user.created=Пользователь успешно создан
+user.not.found=Пользователь не найден
+validation.error=Ошибка валидации данных
+```
+
+### Использование
+```java
+@Autowired
+private MessageSource messageSource;
+
+public String getMessage(String code, Object... args) {
+    return messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
+}
+```
+
+## Заключение
+
+Отвечай всегда на русском языке, объясняй технические концепции простыми словами, но пиши код на английском языке. Это обеспечит читаемость кода для международного сообщества разработчиков, при этом сохранив понятность объяснений на русском языке. 
