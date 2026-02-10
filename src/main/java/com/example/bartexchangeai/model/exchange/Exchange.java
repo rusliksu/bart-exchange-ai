@@ -1,11 +1,13 @@
 package com.example.bartexchangeai.model.exchange;
 
+import com.example.bartexchangeai.model.BaseEntity;
 import com.example.bartexchangeai.model.user.User;
 import com.example.bartexchangeai.model.user.Review;
 import com.example.bartexchangeai.model.offer.Offer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -14,9 +16,10 @@ import java.util.Set;
 @Entity
 @Table(name = "exchanges")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Exchange {
+public class Exchange extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

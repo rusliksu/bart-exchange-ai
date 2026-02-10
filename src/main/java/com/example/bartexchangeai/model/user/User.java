@@ -1,5 +1,6 @@
 package com.example.bartexchangeai.model.user;
 
+import com.example.bartexchangeai.model.BaseEntity;
 import com.example.bartexchangeai.model.offer.Offer;
 import com.example.bartexchangeai.model.exchange.Exchange;
 import com.example.bartexchangeai.model.exchange.Message;
@@ -17,10 +18,10 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(exclude = {"offers", "reviewsGiven", "reviewsReceived", "messages", "groups", "initiatedExchanges", "participatedExchanges"})
-@EqualsAndHashCode(exclude = {"offers", "reviewsGiven", "reviewsReceived", "messages", "groups", "initiatedExchanges", "participatedExchanges"})
+@EqualsAndHashCode(callSuper = false, exclude = {"offers", "reviewsGiven", "reviewsReceived", "messages", "groups", "initiatedExchanges", "participatedExchanges"})
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

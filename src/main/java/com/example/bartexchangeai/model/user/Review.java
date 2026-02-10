@@ -1,17 +1,20 @@
 package com.example.bartexchangeai.model.user;
 
+import com.example.bartexchangeai.model.BaseEntity;
 import com.example.bartexchangeai.model.exchange.Exchange;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "reviews")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Review {
+public class Review extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

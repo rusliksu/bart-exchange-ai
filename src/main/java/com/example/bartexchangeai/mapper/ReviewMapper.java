@@ -34,6 +34,8 @@ public interface ReviewMapper {
     @Mapping(target = "reviewer", source = "reviewerId", qualifiedByName = "reviewerIdToUser")
     @Mapping(target = "reviewedUser", source = "reviewedUserId", qualifiedByName = "reviewedUserIdToUser")
     @Mapping(target = "exchange", source = "exchangeId", qualifiedByName = "exchangeIdToExchange")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Review toEntity(ReviewDto reviewDto);
     
     /**

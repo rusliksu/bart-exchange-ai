@@ -35,6 +35,8 @@ public interface OfferMapper {
     @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
     @Mapping(target = "group", source = "groupId", qualifiedByName = "groupIdToGroup")
     @Mapping(target = "exchanges", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Offer toEntity(OfferDto offerDto);
     
     /**
