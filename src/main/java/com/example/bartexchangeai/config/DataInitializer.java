@@ -5,7 +5,9 @@ import com.example.bartexchangeai.model.user.User;
 import com.example.bartexchangeai.model.offer.Category;
 import com.example.bartexchangeai.model.offer.Offer;
 import com.example.bartexchangeai.model.exchange.Exchange;
+import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import com.example.bartexchangeai.model.exchange.Message;
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import com.example.bartexchangeai.model.user.Review;
 import com.example.bartexchangeai.model.group.Group;
 import com.example.bartexchangeai.repository.*;
@@ -102,7 +104,7 @@ public class DataInitializer {
         Offer laptopOffer = new Offer();
         laptopOffer.setTitle("MacBook Pro 13-inch");
         laptopOffer.setDescription("Excellent condition MacBook Pro, 2022 model. Perfect for work or study.");
-        laptopOffer.setStatus("ACTIVE");
+        laptopOffer.setStatus(OfferStatus.ACTIVE);
         laptopOffer.setUser(alice);
         laptopOffer.setCategory(electronics);
         laptopOffer.setGroup(techGroup);
@@ -111,7 +113,7 @@ public class DataInitializer {
         Offer phoneOffer = new Offer();
         phoneOffer.setTitle("iPhone 14");
         phoneOffer.setDescription("Mint condition iPhone 14, barely used. Comes with original box.");
-        phoneOffer.setStatus("ACTIVE");
+        phoneOffer.setStatus(OfferStatus.ACTIVE);
         phoneOffer.setUser(bob);
         phoneOffer.setCategory(electronics);
         phoneOffer = offerRepository.save(phoneOffer);
@@ -119,7 +121,7 @@ public class DataInitializer {
         Offer bookOffer = new Offer();
         bookOffer.setTitle("Programming Books Collection");
         bookOffer.setDescription("Collection of programming books: Clean Code, Design Patterns, Algorithms.");
-        bookOffer.setStatus("ACTIVE");
+        bookOffer.setStatus(OfferStatus.ACTIVE);
         bookOffer.setUser(charlie);
         bookOffer.setCategory(books);
         bookOffer.setGroup(bookClub);
@@ -128,7 +130,7 @@ public class DataInitializer {
         Offer bikeOffer = new Offer();
         bikeOffer.setTitle("Mountain Bike");
         bikeOffer.setDescription("Great mountain bike, perfect for trails and city riding.");
-        bikeOffer.setStatus("ACTIVE");
+        bikeOffer.setStatus(OfferStatus.ACTIVE);
         bikeOffer.setUser(alice);
         bikeOffer.setCategory(sports);
         bikeOffer = offerRepository.save(bikeOffer);
@@ -136,7 +138,7 @@ public class DataInitializer {
         Offer plantOffer = new Offer();
         plantOffer.setTitle("Indoor Plant Collection");
         plantOffer.setDescription("Beautiful collection of indoor plants. Great for home decoration.");
-        plantOffer.setStatus("COMPLETED");
+        plantOffer.setStatus(OfferStatus.COMPLETED);
         plantOffer.setUser(bob);
         plantOffer.setCategory(home);
         plantOffer = offerRepository.save(plantOffer);
@@ -146,7 +148,7 @@ public class DataInitializer {
         exchange1.setInitiator(bob);
         exchange1.setParticipant(alice);
         exchange1.setOffer(laptopOffer);
-        exchange1.setStatus("PENDING");
+        exchange1.setStatus(ExchangeStatus.PENDING);
         exchange1.setDate(LocalDateTime.now().minusDays(2));
         exchange1 = exchangeRepository.save(exchange1);
 
@@ -154,7 +156,7 @@ public class DataInitializer {
         exchange2.setInitiator(charlie);
         exchange2.setParticipant(bob);
         exchange2.setOffer(phoneOffer);
-        exchange2.setStatus("COMPLETED");
+        exchange2.setStatus(ExchangeStatus.COMPLETED);
         exchange2.setDate(LocalDateTime.now().minusDays(5));
         exchange2 = exchangeRepository.save(exchange2);
 

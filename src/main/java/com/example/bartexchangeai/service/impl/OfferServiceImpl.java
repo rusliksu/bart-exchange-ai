@@ -4,6 +4,7 @@ import com.example.bartexchangeai.dto.OfferDto;
 import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.mapper.OfferMapper;
 import com.example.bartexchangeai.model.offer.Offer;
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import com.example.bartexchangeai.repository.CategoryRepository;
 import com.example.bartexchangeai.repository.OfferRepository;
 import com.example.bartexchangeai.repository.UserRepository;
@@ -39,7 +40,7 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public List<OfferDto> findByStatus(String status) {
+    public List<OfferDto> findByStatus(OfferStatus status) {
         return offerMapper.toDtoList(offerRepository.findByStatus(status));
     }
 

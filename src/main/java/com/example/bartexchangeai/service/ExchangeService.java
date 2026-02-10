@@ -1,6 +1,7 @@
 package com.example.bartexchangeai.service;
 
 import com.example.bartexchangeai.dto.ExchangeDto;
+import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,7 +13,7 @@ public interface ExchangeService {
 
     ExchangeDto findById(Long id);
 
-    List<ExchangeDto> findByStatus(String status);
+    List<ExchangeDto> findByStatus(ExchangeStatus status);
 
     List<ExchangeDto> findByUserId(Long userId);
 
@@ -22,7 +23,7 @@ public interface ExchangeService {
 
     ExchangeDto create(ExchangeDto exchangeDto);
 
-    ExchangeDto updateStatus(Long id, String status);
+    ExchangeDto updateStatus(Long id, ExchangeStatus status);
 
     ExchangeDto complete(Long id);
 

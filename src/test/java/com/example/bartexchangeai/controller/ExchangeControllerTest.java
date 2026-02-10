@@ -2,6 +2,7 @@ package com.example.bartexchangeai.controller;
 
 import com.example.bartexchangeai.dto.ExchangeDto;
 import com.example.bartexchangeai.exception.ResourceNotFoundException;
+import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import com.example.bartexchangeai.service.ExchangeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class ExchangeControllerTest {
 
     @Test
     void getAllExchanges_returnsPage() throws Exception {
-        ExchangeDto exchange = new ExchangeDto(1L, "PENDING", LocalDateTime.now(), 1L, 2L, 1L);
+        ExchangeDto exchange = new ExchangeDto(1L, ExchangeStatus.PENDING, LocalDateTime.now(), 1L, 2L, 1L);
         when(exchangeService.findAll(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(exchange)));
 
@@ -57,7 +58,7 @@ class ExchangeControllerTest {
 
     @Test
     void getExchangeById_found() throws Exception {
-        ExchangeDto exchange = new ExchangeDto(1L, "PENDING", LocalDateTime.now(), 1L, 2L, 1L);
+        ExchangeDto exchange = new ExchangeDto(1L, ExchangeStatus.PENDING, LocalDateTime.now(), 1L, 2L, 1L);
         when(exchangeService.findById(1L)).thenReturn(exchange);
 
         mockMvc.perform(get("/api/exchanges/1"))
@@ -81,7 +82,7 @@ class ExchangeControllerTest {
     @Test
     void createExchange_valid() throws Exception {
         ExchangeDto inputDto = new ExchangeDto(null, null, null, 1L, 2L, 1L);
-        ExchangeDto savedDto = new ExchangeDto(1L, "PENDING", LocalDateTime.now(), 1L, 2L, 1L);
+        ExchangeDto savedDto = new ExchangeDto(1L, ExchangeStatus.PENDING, LocalDateTime.now(), 1L, 2L, 1L);
         when(exchangeService.create(any(ExchangeDto.class))).thenReturn(savedDto);
 
         mockMvc.perform(post("/api/exchanges")
@@ -94,7 +95,7 @@ class ExchangeControllerTest {
 
     @Test
     void completeExchange_success() throws Exception {
-        ExchangeDto completedDto = new ExchangeDto(1L, "COMPLETED", LocalDateTime.now(), 1L, 2L, 1L);
+        ExchangeDto completedDto = new ExchangeDto(1L, ExchangeStatus.COMPLETED, LocalDateTime.now(), 1L, 2L, 1L);
         when(exchangeService.complete(1L)).thenReturn(completedDto);
 
         mockMvc.perform(put("/api/exchanges/complete/1"))

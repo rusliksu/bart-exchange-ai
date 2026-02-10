@@ -4,6 +4,7 @@ import com.example.bartexchangeai.dto.ExchangeDto;
 import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.mapper.ExchangeMapper;
 import com.example.bartexchangeai.model.exchange.Exchange;
+import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import com.example.bartexchangeai.repository.ExchangeRepository;
 import com.example.bartexchangeai.repository.OfferRepository;
 import com.example.bartexchangeai.repository.UserRepository;
@@ -48,10 +49,10 @@ class ExchangeServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Exchange exchange = new Exchange();
         exchange.setId(1L);
-        exchange.setStatus("PENDING");
+        exchange.setStatus(ExchangeStatus.PENDING);
         exchange.setDate(LocalDateTime.now());
 
-        ExchangeDto exchangeDto = new ExchangeDto(1L, "PENDING", LocalDateTime.now(), 1L, 2L, 1L);
+        ExchangeDto exchangeDto = new ExchangeDto(1L, ExchangeStatus.PENDING, LocalDateTime.now(), 1L, 2L, 1L);
 
         Page<Exchange> exchangePage = new PageImpl<>(List.of(exchange));
         when(exchangeRepository.findAll(pageable)).thenReturn(exchangePage);
@@ -61,7 +62,7 @@ class ExchangeServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("PENDING", result.getContent().get(0).getStatus());
+        assertEquals(ExchangeStatus.PENDING, result.getContent().get(0).getStatus());
         verify(exchangeRepository).findAll(pageable);
     }
 
@@ -69,10 +70,10 @@ class ExchangeServiceImplTest {
     void findById_found() {
         Exchange exchange = new Exchange();
         exchange.setId(1L);
-        exchange.setStatus("PENDING");
+        exchange.setStatus(ExchangeStatus.PENDING);
         exchange.setDate(LocalDateTime.now());
 
-        ExchangeDto exchangeDto = new ExchangeDto(1L, "PENDING", LocalDateTime.now(), 1L, 2L, 1L);
+        ExchangeDto exchangeDto = new ExchangeDto(1L, ExchangeStatus.PENDING, LocalDateTime.now(), 1L, 2L, 1L);
 
         when(exchangeRepository.findById(1L)).thenReturn(Optional.of(exchange));
         when(exchangeMapper.toDto(exchange)).thenReturn(exchangeDto);
@@ -81,7 +82,7 @@ class ExchangeServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        assertEquals("PENDING", result.getStatus());
+        assertEquals(ExchangeStatus.PENDING, result.getStatus());
         verify(exchangeRepository).findById(1L);
         verify(exchangeMapper).toDto(exchange);
     }
@@ -99,10 +100,10 @@ class ExchangeServiceImplTest {
         ExchangeDto inputDto = new ExchangeDto(null, null, null, 1L, 2L, 3L);
         Exchange exchange = new Exchange();
         exchange.setId(1L);
-        exchange.setStatus("PENDING");
+        exchange.setStatus(ExchangeStatus.PENDING);
         exchange.setDate(LocalDateTime.now());
 
-        ExchangeDto outputDto = new ExchangeDto(1L, "PENDING", LocalDateTime.now(), 1L, 2L, 3L);
+        ExchangeDto outputDto = new ExchangeDto(1L, ExchangeStatus.PENDING, LocalDateTime.now(), 1L, 2L, 3L);
 
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.existsById(2L)).thenReturn(true);
@@ -115,7 +116,7 @@ class ExchangeServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        assertEquals("PENDING", result.getStatus());
+        assertEquals(ExchangeStatus.PENDING, result.getStatus());
         verify(userRepository).existsById(1L);
         verify(userRepository).existsById(2L);
         verify(offerRepository).existsById(3L);
@@ -160,15 +161,15 @@ class ExchangeServiceImplTest {
     void complete_success() {
         Exchange exchange = new Exchange();
         exchange.setId(1L);
-        exchange.setStatus("PENDING");
+        exchange.setStatus(ExchangeStatus.PENDING);
         exchange.setDate(LocalDateTime.now());
 
         Exchange completedExchange = new Exchange();
         completedExchange.setId(1L);
-        completedExchange.setStatus("COMPLETED");
+        completedExchange.setStatus(ExchangeStatus.COMPLETED);
         completedExchange.setDate(exchange.getDate());
 
-        ExchangeDto outputDto = new ExchangeDto(1L, "COMPLETED", LocalDateTime.now(), 1L, 2L, 3L);
+        ExchangeDto outputDto = new ExchangeDto(1L, ExchangeStatus.COMPLETED, LocalDateTime.now(), 1L, 2L, 3L);
 
         when(exchangeRepository.findById(1L)).thenReturn(Optional.of(exchange));
         when(exchangeRepository.save(exchange)).thenReturn(completedExchange);
@@ -177,7 +178,7 @@ class ExchangeServiceImplTest {
         ExchangeDto result = exchangeService.complete(1L);
 
         assertNotNull(result);
-        assertEquals("COMPLETED", result.getStatus());
+        assertEquals(ExchangeStatus.COMPLETED, result.getStatus());
         verify(exchangeRepository).findById(1L);
         verify(exchangeRepository).save(exchange);
     }
@@ -186,15 +187,15 @@ class ExchangeServiceImplTest {
     void cancel_success() {
         Exchange exchange = new Exchange();
         exchange.setId(1L);
-        exchange.setStatus("PENDING");
+        exchange.setStatus(ExchangeStatus.PENDING);
         exchange.setDate(LocalDateTime.now());
 
         Exchange cancelledExchange = new Exchange();
         cancelledExchange.setId(1L);
-        cancelledExchange.setStatus("CANCELLED");
+        cancelledExchange.setStatus(ExchangeStatus.CANCELLED);
         cancelledExchange.setDate(exchange.getDate());
 
-        ExchangeDto outputDto = new ExchangeDto(1L, "CANCELLED", LocalDateTime.now(), 1L, 2L, 3L);
+        ExchangeDto outputDto = new ExchangeDto(1L, ExchangeStatus.CANCELLED, LocalDateTime.now(), 1L, 2L, 3L);
 
         when(exchangeRepository.findById(1L)).thenReturn(Optional.of(exchange));
         when(exchangeRepository.save(exchange)).thenReturn(cancelledExchange);
@@ -203,7 +204,7 @@ class ExchangeServiceImplTest {
         ExchangeDto result = exchangeService.cancel(1L);
 
         assertNotNull(result);
-        assertEquals("CANCELLED", result.getStatus());
+        assertEquals(ExchangeStatus.CANCELLED, result.getStatus());
         verify(exchangeRepository).findById(1L);
         verify(exchangeRepository).save(exchange);
     }

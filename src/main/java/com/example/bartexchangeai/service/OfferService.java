@@ -1,6 +1,7 @@
 package com.example.bartexchangeai.service;
 
 import com.example.bartexchangeai.dto.OfferDto;
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,7 +13,7 @@ public interface OfferService {
 
     OfferDto findById(Long id);
 
-    List<OfferDto> findByStatus(String status);
+    List<OfferDto> findByStatus(OfferStatus status);
 
     List<OfferDto> findByUserId(Long userId);
 
