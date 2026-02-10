@@ -4,6 +4,7 @@ import com.example.bartexchangeai.dto.ExchangeDto;
 import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.mapper.ExchangeMapper;
 import com.example.bartexchangeai.model.exchange.Exchange;
+import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import com.example.bartexchangeai.repository.ExchangeRepository;
 import com.example.bartexchangeai.repository.OfferRepository;
 import com.example.bartexchangeai.repository.UserRepository;
@@ -40,7 +41,7 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public List<ExchangeDto> findByStatus(String status) {
+    public List<ExchangeDto> findByStatus(ExchangeStatus status) {
         return exchangeMapper.toDtoList(exchangeRepository.findByStatus(status));
     }
 
@@ -74,14 +75,14 @@ public class ExchangeServiceImpl implements ExchangeService {
         Exchange exchange = exchangeMapper.toEntity(exchangeDto);
         exchange.setDate(LocalDateTime.now());
         if (exchange.getStatus() == null) {
-            exchange.setStatus("PENDING");
+            exchange.setStatus(ExchangeStatus.PENDING);
         }
         return exchangeMapper.toDto(exchangeRepository.save(exchange));
     }
 
     @Override
     @Transactional
-    public ExchangeDto updateStatus(Long id, String status) {
+    public ExchangeDto updateStatus(Long id, ExchangeStatus status) {
         Exchange exchange = exchangeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exchange", id));
         exchange.setStatus(status);
@@ -91,13 +92,13 @@ public class ExchangeServiceImpl implements ExchangeService {
     @Override
     @Transactional
     public ExchangeDto complete(Long id) {
-        return updateStatus(id, "COMPLETED");
+        return updateStatus(id, ExchangeStatus.COMPLETED);
     }
 
     @Override
     @Transactional
     public ExchangeDto cancel(Long id) {
-        return updateStatus(id, "CANCELLED");
+        return updateStatus(id, ExchangeStatus.CANCELLED);
     }
 
     @Override

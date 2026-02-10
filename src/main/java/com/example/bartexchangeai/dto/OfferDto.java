@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -22,8 +23,8 @@ public class OfferDto {
     
     private String description;
     
-    @NotBlank(message = "Статус обязателен")
-    private String status;
+    @NotNull(message = "Статус обязателен")
+    private OfferStatus status;
     
     @NotNull(message = "ID пользователя обязателен")
     private Long userId;

@@ -1,6 +1,7 @@
 package com.example.bartexchangeai.controller;
 
 import com.example.bartexchangeai.dto.ExchangeDto;
+import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import com.example.bartexchangeai.service.ExchangeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +36,7 @@ public class ExchangeController {
 
     @GetMapping("/status/{status}")
     @Operation(summary = "Get exchanges by status")
-    public List<ExchangeDto> getExchangesByStatus(@PathVariable String status) {
+    public List<ExchangeDto> getExchangesByStatus(@PathVariable ExchangeStatus status) {
         return exchangeService.findByStatus(status);
     }
 

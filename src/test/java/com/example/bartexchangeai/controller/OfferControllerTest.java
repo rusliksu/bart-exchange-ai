@@ -2,6 +2,7 @@ package com.example.bartexchangeai.controller;
 
 import com.example.bartexchangeai.dto.OfferDto;
 import com.example.bartexchangeai.exception.ResourceNotFoundException;
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import com.example.bartexchangeai.service.OfferService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class OfferControllerTest {
 
     @Test
     void getAllOffers_returnsPage() throws Exception {
-        OfferDto offer = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", "ACTIVE", 1L, 1L, null);
+        OfferDto offer = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", OfferStatus.ACTIVE, 1L, 1L, null);
         when(offerService.findAll(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(offer)));
 
@@ -57,7 +58,7 @@ class OfferControllerTest {
 
     @Test
     void getOfferById_found() throws Exception {
-        OfferDto offer = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", "ACTIVE", 1L, 1L, null);
+        OfferDto offer = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", OfferStatus.ACTIVE, 1L, 1L, null);
         when(offerService.findById(1L)).thenReturn(offer);
 
         mockMvc.perform(get("/api/offers/1"))
@@ -79,8 +80,8 @@ class OfferControllerTest {
 
     @Test
     void createOffer_valid() throws Exception {
-        OfferDto inputDto = new OfferDto(null, "Телефон", "Новый телефон", "ACTIVE", 1L, 2L, null);
-        OfferDto savedDto = new OfferDto(1L, "Телефон", "Новый телефон", "ACTIVE", 1L, 2L, null);
+        OfferDto inputDto = new OfferDto(null, "Телефон", "Новый телефон", OfferStatus.ACTIVE, 1L, 2L, null);
+        OfferDto savedDto = new OfferDto(1L, "Телефон", "Новый телефон", OfferStatus.ACTIVE, 1L, 2L, null);
         when(offerService.create(any(OfferDto.class))).thenReturn(savedDto);
 
         mockMvc.perform(post("/api/offers")
@@ -93,7 +94,7 @@ class OfferControllerTest {
 
     @Test
     void searchOffers_returnsResults() throws Exception {
-        OfferDto offer = new OfferDto(1L, "Ноутбук Lenovo", "Игровой ноутбук", "ACTIVE", 1L, 1L, null);
+        OfferDto offer = new OfferDto(1L, "Ноутбук Lenovo", "Игровой ноутбук", OfferStatus.ACTIVE, 1L, 1L, null);
         when(offerService.search(eq("ноутбук"))).thenReturn(List.of(offer));
 
         mockMvc.perform(get("/api/offers/search").param("keyword", "ноутбук"))

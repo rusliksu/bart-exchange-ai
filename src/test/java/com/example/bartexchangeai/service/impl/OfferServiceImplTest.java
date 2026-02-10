@@ -5,6 +5,7 @@ import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.mapper.OfferMapper;
 import com.example.bartexchangeai.model.offer.Category;
 import com.example.bartexchangeai.model.offer.Offer;
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import com.example.bartexchangeai.model.user.User;
 import com.example.bartexchangeai.repository.CategoryRepository;
 import com.example.bartexchangeai.repository.OfferRepository;
@@ -50,9 +51,9 @@ class OfferServiceImplTest {
         Offer offer = new Offer();
         offer.setId(1L);
         offer.setTitle("Ноутбук");
-        offer.setStatus("ACTIVE");
+        offer.setStatus(OfferStatus.ACTIVE);
 
-        OfferDto offerDto = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", "ACTIVE", 1L, 1L, null);
+        OfferDto offerDto = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", OfferStatus.ACTIVE, 1L, 1L, null);
 
         Page<Offer> offerPage = new PageImpl<>(List.of(offer));
         when(offerRepository.findAll(pageable)).thenReturn(offerPage);
@@ -72,7 +73,7 @@ class OfferServiceImplTest {
         offer.setId(1L);
         offer.setTitle("Ноутбук");
 
-        OfferDto offerDto = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", "ACTIVE", 1L, 1L, null);
+        OfferDto offerDto = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", OfferStatus.ACTIVE, 1L, 1L, null);
 
         when(offerRepository.findById(1L)).thenReturn(Optional.of(offer));
         when(offerMapper.toDto(offer)).thenReturn(offerDto);
@@ -99,31 +100,31 @@ class OfferServiceImplTest {
         Offer offer = new Offer();
         offer.setId(1L);
         offer.setTitle("Ноутбук");
-        offer.setStatus("ACTIVE");
+        offer.setStatus(OfferStatus.ACTIVE);
 
-        OfferDto offerDto = new OfferDto(1L, "Ноутбук", "Описание", "ACTIVE", 1L, 1L, null);
+        OfferDto offerDto = new OfferDto(1L, "Ноутбук", "Описание", OfferStatus.ACTIVE, 1L, 1L, null);
 
-        when(offerRepository.findByStatus("ACTIVE")).thenReturn(List.of(offer));
+        when(offerRepository.findByStatus(OfferStatus.ACTIVE)).thenReturn(List.of(offer));
         when(offerMapper.toDtoList(List.of(offer))).thenReturn(List.of(offerDto));
 
-        List<OfferDto> result = offerService.findByStatus("ACTIVE");
+        List<OfferDto> result = offerService.findByStatus(OfferStatus.ACTIVE);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("ACTIVE", result.get(0).getStatus());
-        verify(offerRepository).findByStatus("ACTIVE");
+        assertEquals(OfferStatus.ACTIVE, result.get(0).getStatus());
+        verify(offerRepository).findByStatus(OfferStatus.ACTIVE);
     }
 
     @Test
     void create_success() {
-        OfferDto inputDto = new OfferDto(null, "Ноутбук", "Хороший ноутбук", "ACTIVE", 1L, 2L, null);
+        OfferDto inputDto = new OfferDto(null, "Ноутбук", "Хороший ноутбук", OfferStatus.ACTIVE, 1L, 2L, null);
         Offer offer = new Offer();
         offer.setId(1L);
         offer.setTitle("Ноутбук");
         offer.setDescription("Хороший ноутбук");
-        offer.setStatus("ACTIVE");
+        offer.setStatus(OfferStatus.ACTIVE);
 
-        OfferDto outputDto = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", "ACTIVE", 1L, 2L, null);
+        OfferDto outputDto = new OfferDto(1L, "Ноутбук", "Хороший ноутбук", OfferStatus.ACTIVE, 1L, 2L, null);
 
         when(userRepository.existsById(1L)).thenReturn(true);
         when(categoryRepository.existsById(2L)).thenReturn(true);
@@ -143,7 +144,7 @@ class OfferServiceImplTest {
 
     @Test
     void create_userNotFound_throws() {
-        OfferDto inputDto = new OfferDto(null, "Ноутбук", "Описание", "ACTIVE", 99L, 1L, null);
+        OfferDto inputDto = new OfferDto(null, "Ноутбук", "Описание", OfferStatus.ACTIVE, 99L, 1L, null);
 
         when(userRepository.existsById(99L)).thenReturn(false);
 
@@ -154,7 +155,7 @@ class OfferServiceImplTest {
 
     @Test
     void create_categoryNotFound_throws() {
-        OfferDto inputDto = new OfferDto(null, "Ноутбук", "Описание", "ACTIVE", 1L, 99L, null);
+        OfferDto inputDto = new OfferDto(null, "Ноутбук", "Описание", OfferStatus.ACTIVE, 1L, 99L, null);
 
         when(userRepository.existsById(1L)).thenReturn(true);
         when(categoryRepository.existsById(99L)).thenReturn(false);
@@ -170,14 +171,14 @@ class OfferServiceImplTest {
         existingOffer.setId(1L);
         existingOffer.setTitle("Старый заголовок");
         existingOffer.setDescription("Старое описание");
-        existingOffer.setStatus("ACTIVE");
+        existingOffer.setStatus(OfferStatus.ACTIVE);
 
         Category category = new Category();
         category.setId(2L);
         category.setName("Электроника");
 
-        OfferDto updateDto = new OfferDto(1L, "Новый заголовок", "Новое описание", "CLOSED", 1L, 2L, null);
-        OfferDto outputDto = new OfferDto(1L, "Новый заголовок", "Новое описание", "CLOSED", 1L, 2L, null);
+        OfferDto updateDto = new OfferDto(1L, "Новый заголовок", "Новое описание", OfferStatus.CANCELLED, 1L, 2L, null);
+        OfferDto outputDto = new OfferDto(1L, "Новый заголовок", "Новое описание", OfferStatus.CANCELLED, 1L, 2L, null);
 
         when(offerRepository.findById(1L)).thenReturn(Optional.of(existingOffer));
         when(categoryRepository.findById(2L)).thenReturn(Optional.of(category));
@@ -189,7 +190,7 @@ class OfferServiceImplTest {
         assertNotNull(result);
         assertEquals("Новый заголовок", result.getTitle());
         assertEquals("Новое описание", result.getDescription());
-        assertEquals("CLOSED", result.getStatus());
+        assertEquals(OfferStatus.CANCELLED, result.getStatus());
         verify(offerRepository).findById(1L);
         verify(offerRepository).save(existingOffer);
     }

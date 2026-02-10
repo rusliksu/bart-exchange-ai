@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -17,7 +18,7 @@ public class ExchangeDto {
     
     private Long id;
     
-    private String status;
+    private ExchangeStatus status;
     
     private LocalDateTime date;
     

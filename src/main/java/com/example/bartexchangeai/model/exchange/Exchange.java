@@ -22,8 +22,9 @@ public class Exchange {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private ExchangeStatus status;
     
     @Column(nullable = false)
     private LocalDateTime date;
