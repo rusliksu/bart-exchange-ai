@@ -25,6 +25,8 @@ public interface CategoryMapper {
      * Преобразует CategoryDto в Category
      */
     @Mapping(target = "offers", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Category toEntity(CategoryDto categoryDto);
     
     /**

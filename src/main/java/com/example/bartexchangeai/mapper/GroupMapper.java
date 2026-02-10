@@ -28,6 +28,8 @@ public interface GroupMapper {
      */
     @Mapping(target = "members", ignore = true)
     @Mapping(target = "offers", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Group toEntity(GroupDto groupDto);
     
     /**

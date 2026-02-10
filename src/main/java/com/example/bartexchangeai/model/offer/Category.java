@@ -1,5 +1,6 @@
 package com.example.bartexchangeai.model.offer;
 
+import com.example.bartexchangeai.model.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,10 +14,10 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(exclude = "offers")
-@EqualsAndHashCode(exclude = "offers")
+@EqualsAndHashCode(callSuper = false, exclude = "offers")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category {
+public class Category extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

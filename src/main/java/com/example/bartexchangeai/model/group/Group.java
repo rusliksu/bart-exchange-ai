@@ -1,5 +1,6 @@
 package com.example.bartexchangeai.model.group;
 
+import com.example.bartexchangeai.model.BaseEntity;
 import com.example.bartexchangeai.model.user.User;
 import com.example.bartexchangeai.model.offer.Offer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,10 +16,10 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(exclude = {"members", "offers"})
-@EqualsAndHashCode(exclude = {"members", "offers"})
+@EqualsAndHashCode(callSuper = false, exclude = {"members", "offers"})
 @NoArgsConstructor
 @AllArgsConstructor
-public class Group {
+public class Group extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

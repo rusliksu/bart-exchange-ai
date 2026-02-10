@@ -1,10 +1,13 @@
 package com.example.bartexchangeai.service.impl;
 
 import com.example.bartexchangeai.dto.ExchangeDto;
+import com.example.bartexchangeai.exception.InvalidOperationException;
 import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.mapper.ExchangeMapper;
 import com.example.bartexchangeai.model.exchange.Exchange;
 import com.example.bartexchangeai.model.exchange.ExchangeStatus;
+import com.example.bartexchangeai.model.offer.Offer;
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import com.example.bartexchangeai.repository.ExchangeRepository;
 import com.example.bartexchangeai.repository.OfferRepository;
 import com.example.bartexchangeai.repository.UserRepository;
@@ -98,6 +101,11 @@ class ExchangeServiceImplTest {
     @Test
     void create_success() {
         ExchangeDto inputDto = new ExchangeDto(null, null, null, 1L, 2L, 3L);
+
+        Offer activeOffer = new Offer();
+        activeOffer.setId(3L);
+        activeOffer.setStatus(OfferStatus.ACTIVE);
+
         Exchange exchange = new Exchange();
         exchange.setId(1L);
         exchange.setStatus(ExchangeStatus.PENDING);
@@ -107,7 +115,7 @@ class ExchangeServiceImplTest {
 
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.existsById(2L)).thenReturn(true);
-        when(offerRepository.existsById(3L)).thenReturn(true);
+        when(offerRepository.findById(3L)).thenReturn(Optional.of(activeOffer));
         when(exchangeMapper.toEntity(inputDto)).thenReturn(exchange);
         when(exchangeRepository.save(exchange)).thenReturn(exchange);
         when(exchangeMapper.toDto(exchange)).thenReturn(outputDto);
@@ -119,8 +127,32 @@ class ExchangeServiceImplTest {
         assertEquals(ExchangeStatus.PENDING, result.getStatus());
         verify(userRepository).existsById(1L);
         verify(userRepository).existsById(2L);
-        verify(offerRepository).existsById(3L);
+        verify(offerRepository).findById(3L);
         verify(exchangeRepository).save(exchange);
+    }
+
+    @Test
+    void create_sameInitiatorAndParticipant_throws() {
+        ExchangeDto inputDto = new ExchangeDto(null, null, null, 1L, 1L, 3L);
+
+        assertThrows(InvalidOperationException.class, () -> exchangeService.create(inputDto));
+        verify(exchangeRepository, never()).save(any());
+    }
+
+    @Test
+    void create_inactiveOffer_throws() {
+        ExchangeDto inputDto = new ExchangeDto(null, null, null, 1L, 2L, 3L);
+
+        Offer completedOffer = new Offer();
+        completedOffer.setId(3L);
+        completedOffer.setStatus(OfferStatus.COMPLETED);
+
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
+        when(offerRepository.findById(3L)).thenReturn(Optional.of(completedOffer));
+
+        assertThrows(InvalidOperationException.class, () -> exchangeService.create(inputDto));
+        verify(exchangeRepository, never()).save(any());
     }
 
     @Test
@@ -151,7 +183,7 @@ class ExchangeServiceImplTest {
 
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.existsById(2L)).thenReturn(true);
-        when(offerRepository.existsById(99L)).thenReturn(false);
+        when(offerRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> exchangeService.create(inputDto));
         verify(exchangeRepository, never()).save(any());
@@ -184,6 +216,19 @@ class ExchangeServiceImplTest {
     }
 
     @Test
+    void complete_nonPending_throws() {
+        Exchange exchange = new Exchange();
+        exchange.setId(1L);
+        exchange.setStatus(ExchangeStatus.COMPLETED);
+        exchange.setDate(LocalDateTime.now());
+
+        when(exchangeRepository.findById(1L)).thenReturn(Optional.of(exchange));
+
+        assertThrows(InvalidOperationException.class, () -> exchangeService.complete(1L));
+        verify(exchangeRepository, never()).save(any());
+    }
+
+    @Test
     void cancel_success() {
         Exchange exchange = new Exchange();
         exchange.setId(1L);
@@ -207,6 +252,19 @@ class ExchangeServiceImplTest {
         assertEquals(ExchangeStatus.CANCELLED, result.getStatus());
         verify(exchangeRepository).findById(1L);
         verify(exchangeRepository).save(exchange);
+    }
+
+    @Test
+    void cancel_nonPending_throws() {
+        Exchange exchange = new Exchange();
+        exchange.setId(1L);
+        exchange.setStatus(ExchangeStatus.CANCELLED);
+        exchange.setDate(LocalDateTime.now());
+
+        when(exchangeRepository.findById(1L)).thenReturn(Optional.of(exchange));
+
+        assertThrows(InvalidOperationException.class, () -> exchangeService.cancel(1L));
+        verify(exchangeRepository, never()).save(any());
     }
 
     @Test

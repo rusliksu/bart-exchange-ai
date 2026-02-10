@@ -31,6 +31,8 @@ public interface MessageMapper {
      */
     @Mapping(target = "sender", source = "senderId", qualifiedByName = "senderIdToUser")
     @Mapping(target = "exchange", source = "exchangeId", qualifiedByName = "exchangeIdToExchange")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Message toEntity(MessageDto messageDto);
     
     /**

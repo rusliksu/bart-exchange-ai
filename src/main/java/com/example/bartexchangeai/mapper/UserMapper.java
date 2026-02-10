@@ -33,6 +33,8 @@ public interface UserMapper {
     @Mapping(target = "participatedExchanges", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     User toEntity(UserDto userDto);
     
     /**

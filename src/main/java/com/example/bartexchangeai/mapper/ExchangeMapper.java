@@ -35,6 +35,8 @@ public interface ExchangeMapper {
     @Mapping(target = "offer", source = "offerId", qualifiedByName = "offerIdToOffer")
     @Mapping(target = "messages", ignore = true)
     @Mapping(target = "reviews", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Exchange toEntity(ExchangeDto exchangeDto);
     
     /**

@@ -1,10 +1,13 @@
 package com.example.bartexchangeai.service.impl;
 
 import com.example.bartexchangeai.dto.ExchangeDto;
+import com.example.bartexchangeai.exception.InvalidOperationException;
 import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.mapper.ExchangeMapper;
 import com.example.bartexchangeai.model.exchange.Exchange;
 import com.example.bartexchangeai.model.exchange.ExchangeStatus;
+import com.example.bartexchangeai.model.offer.Offer;
+import com.example.bartexchangeai.model.offer.OfferStatus;
 import com.example.bartexchangeai.repository.ExchangeRepository;
 import com.example.bartexchangeai.repository.OfferRepository;
 import com.example.bartexchangeai.repository.UserRepository;
@@ -63,14 +66,19 @@ public class ExchangeServiceImpl implements ExchangeService {
     @Override
     @Transactional
     public ExchangeDto create(ExchangeDto exchangeDto) {
+        if (exchangeDto.getInitiatorId().equals(exchangeDto.getParticipantId())) {
+            throw new InvalidOperationException("Initiator and participant cannot be the same user");
+        }
         if (!userRepository.existsById(exchangeDto.getInitiatorId())) {
             throw new ResourceNotFoundException("User", exchangeDto.getInitiatorId());
         }
         if (!userRepository.existsById(exchangeDto.getParticipantId())) {
             throw new ResourceNotFoundException("User", exchangeDto.getParticipantId());
         }
-        if (!offerRepository.existsById(exchangeDto.getOfferId())) {
-            throw new ResourceNotFoundException("Offer", exchangeDto.getOfferId());
+        Offer offer = offerRepository.findById(exchangeDto.getOfferId())
+                .orElseThrow(() -> new ResourceNotFoundException("Offer", exchangeDto.getOfferId()));
+        if (offer.getStatus() != OfferStatus.ACTIVE) {
+            throw new InvalidOperationException("Cannot create exchange for non-active offer");
         }
         Exchange exchange = exchangeMapper.toEntity(exchangeDto);
         exchange.setDate(LocalDateTime.now());
@@ -92,13 +100,25 @@ public class ExchangeServiceImpl implements ExchangeService {
     @Override
     @Transactional
     public ExchangeDto complete(Long id) {
-        return updateStatus(id, ExchangeStatus.COMPLETED);
+        Exchange exchange = exchangeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Exchange", id));
+        if (exchange.getStatus() != ExchangeStatus.PENDING) {
+            throw new InvalidOperationException("Can only complete exchanges with PENDING status");
+        }
+        exchange.setStatus(ExchangeStatus.COMPLETED);
+        return exchangeMapper.toDto(exchangeRepository.save(exchange));
     }
 
     @Override
     @Transactional
     public ExchangeDto cancel(Long id) {
-        return updateStatus(id, ExchangeStatus.CANCELLED);
+        Exchange exchange = exchangeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Exchange", id));
+        if (exchange.getStatus() != ExchangeStatus.PENDING) {
+            throw new InvalidOperationException("Can only cancel exchanges with PENDING status");
+        }
+        exchange.setStatus(ExchangeStatus.CANCELLED);
+        return exchangeMapper.toDto(exchangeRepository.save(exchange));
     }
 
     @Override
