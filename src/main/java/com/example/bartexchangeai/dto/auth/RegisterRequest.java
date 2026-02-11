@@ -21,6 +21,6 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Пароль обязателен")
-    @Size(min = 6, message = "Пароль должен быть не менее 6 символов")
+    @Size(min = 6, max = 128, message = "Пароль должен быть от 6 до 128 символов")
     private String password;
 }
