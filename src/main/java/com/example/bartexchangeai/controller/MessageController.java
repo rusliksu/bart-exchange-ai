@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,7 @@ public class MessageController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a message")
+    @PreAuthorize("@authz.isMessageSender(#id, authentication.name) or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
         messageService.delete(id);
         return ResponseEntity.noContent().build();

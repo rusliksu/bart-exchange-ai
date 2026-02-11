@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -53,12 +54,14 @@ public class UserController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing user")
+    @PreAuthorize("@authz.isUserSelf(#id, authentication.name) or hasRole('ADMIN')")
     public UserDto updateUser(@PathVariable Long id, @Valid @RequestBody UserDto userDto) {
         return userService.update(id, userDto);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a user")
+    @PreAuthorize("@authz.isUserSelf(#id, authentication.name) or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();

@@ -31,6 +31,8 @@ class RecommendationControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Test
     void getRecommendations_success() throws Exception {

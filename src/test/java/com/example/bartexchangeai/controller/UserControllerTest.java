@@ -5,6 +5,7 @@ import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,6 +38,8 @@ class UserControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -77,6 +80,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createUser_valid() throws Exception {
         UserDto inputDto = new UserDto(null, "newuser", "new@example.com", null);
         UserDto savedDto = new UserDto(1L, "newuser", "new@example.com", 0.0f);
@@ -91,6 +95,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createUser_invalid_emptyUsername() throws Exception {
         UserDto invalidDto = new UserDto(null, "", "test@example.com", null);
 
@@ -102,6 +107,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteUser_success() throws Exception {
         doNothing().when(userService).delete(1L);
 

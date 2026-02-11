@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: bartexchange
       POSTGRES_USER: bartuser
-      POSTGRES_PASSWORD: changeme
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     ports:
       - "5432:5432"
     volumes:
@@ -23,7 +23,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bartexchange
       SPRING_DATASOURCE_USERNAME: bartuser
-      SPRING_DATASOURCE_PASSWORD: changeme
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-changeme}
     ports:
       - "8080:8080"
     depends_on:

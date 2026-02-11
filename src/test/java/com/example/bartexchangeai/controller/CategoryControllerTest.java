@@ -5,6 +5,7 @@ import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.service.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,6 +38,8 @@ class CategoryControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -76,6 +79,7 @@ class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createCategory_valid() throws Exception {
         CategoryDto inputDto = new CategoryDto(null, "Книги");
         CategoryDto savedDto = new CategoryDto(1L, "Книги");
@@ -90,6 +94,7 @@ class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createCategory_invalid_emptyName() throws Exception {
         CategoryDto invalidDto = new CategoryDto(null, "");
 
@@ -101,6 +106,7 @@ class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteCategory_success() throws Exception {
         doNothing().when(categoryService).delete(1L);
 
