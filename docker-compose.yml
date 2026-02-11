@@ -19,11 +19,15 @@ services:
   app:
     build: .
     container_name: bartexchange-app
+    env_file:
+      - .env
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bartexchange
       SPRING_DATASOURCE_USERNAME: bartuser
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-changeme}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-must-be-at-least-256-bits-long}
     ports:
       - "8080:8080"
     depends_on:
