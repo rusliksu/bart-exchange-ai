@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,8 +49,8 @@ public class MessageController {
 
     @PostMapping
     @Operation(summary = "Send a new message")
-    public MessageDto createMessage(@Valid @RequestBody MessageDto messageDto) {
-        return messageService.create(messageDto);
+    public ResponseEntity<MessageDto> createMessage(@Valid @RequestBody MessageDto messageDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(messageService.create(messageDto));
     }
 
     @DeleteMapping("/{id}")

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +42,8 @@ public class CategoryController {
     @PostMapping
     @Operation(summary = "Create a new category")
     @PreAuthorize("hasRole('ADMIN')")
-    public CategoryDto createCategory(@Valid @RequestBody CategoryDto categoryDto) {
-        return categoryService.create(categoryDto);
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(categoryDto));
     }
 
     @PutMapping("/{id}")

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -70,8 +71,8 @@ public class OfferController {
 
     @PostMapping
     @Operation(summary = "Create a new offer")
-    public OfferDto createOffer(@Valid @RequestBody OfferDto offerDto) {
-        return offerService.create(offerDto);
+    public ResponseEntity<OfferDto> createOffer(@Valid @RequestBody OfferDto offerDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(offerService.create(offerDto));
     }
 
     @PutMapping("/{id}")
