@@ -10,10 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/groups")
@@ -26,7 +30,7 @@ public class GroupController {
 
     @GetMapping
     @Operation(summary = "Get all groups")
-    public Page<GroupDto> getAllGroups(Pageable pageable) {
+    public Page<GroupDto> getAllGroups(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return groupService.findAll(pageable);
     }
 
@@ -58,7 +62,10 @@ public class GroupController {
     @Operation(summary = "Create a new group")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GroupDto> createGroup(@Valid @RequestBody GroupDto groupDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(groupService.create(groupDto));
+        GroupDto created = groupService.create(groupDto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(created.getId()).toUri();
+        return ResponseEntity.created(location).body(created);
     }
 
     @PutMapping("/{id}")
