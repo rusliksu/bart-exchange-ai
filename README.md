@@ -5,17 +5,19 @@ REST API for a barter exchange platform built with Spring Boot.
 ## Tech Stack
 
 - **Java 21**, **Spring Boot 3.5**
+- **Spring AI** + OpenAI (GPT-4o-mini) for recommendations
 - **Spring Security** + JWT authentication
 - **Spring Data JPA** + Hibernate
 - **PostgreSQL** (prod) / **H2** (dev)
 - **Liquibase** for database migrations
 - **MapStruct** for DTO mapping
 - **Swagger/OpenAPI** (springdoc)
-- **JUnit 5** + **Mockito** (116 tests)
+- **JUnit 5** + **Mockito** (130+ tests)
 - **Docker Compose** for local PostgreSQL
 
 ## Features
 
+- **AI-powered offer recommendations** (personalized per user)
 - User management with rating system
 - Offer listings with categories and groups
 - Exchange workflow (create, complete, cancel)
@@ -59,16 +61,17 @@ docker compose up -d
 
 ## API Endpoints
 
-| Resource    | URL                  | Methods                          |
-|-------------|----------------------|----------------------------------|
-| Auth        | `/api/auth`          | POST register, login             |
-| Users       | `/api/users`         | GET, POST, PUT, DELETE           |
-| Categories  | `/api/categories`    | GET, POST, PUT, DELETE           |
-| Offers      | `/api/offers`        | GET, POST, PUT, DELETE + search  |
-| Exchanges   | `/api/exchanges`     | GET, POST, PUT, DELETE + complete/cancel |
-| Messages    | `/api/messages`      | GET, POST, DELETE                |
-| Reviews     | `/api/reviews`       | GET, POST, PUT, DELETE + average |
-| Groups      | `/api/groups`        | GET, POST, PUT, DELETE + search  |
+| Resource          | URL                          | Methods                          |
+|-------------------|------------------------------|----------------------------------|
+| Recommendations   | `/api/recommendations`       | GET personalized offers          |
+| Auth              | `/api/auth`                  | POST register, login             |
+| Users             | `/api/users`                 | GET, POST, PUT, DELETE           |
+| Categories        | `/api/categories`            | GET, POST, PUT, DELETE           |
+| Offers            | `/api/offers`                | GET, POST, PUT, DELETE + search  |
+| Exchanges         | `/api/exchanges`             | GET, POST, PUT, DELETE + complete/cancel |
+| Messages          | `/api/messages`              | GET, POST, DELETE                |
+| Reviews           | `/api/reviews`               | GET, POST, PUT, DELETE + average |
+| Groups            | `/api/groups`                | GET, POST, PUT, DELETE + search  |
 
 ### Authentication
 
@@ -85,6 +88,43 @@ curl -H "Authorization: Bearer <token>" \
   -X POST http://localhost:8080/api/offers ...
 ```
 
+### AI Recommendations
+
+The platform uses OpenAI GPT-4o-mini to generate personalized offer recommendations based on user's exchange history, preferred categories and ratings.
+
+```bash
+# Get recommendations for user with id=1
+curl http://localhost:8080/api/recommendations/user/1
+```
+
+Response:
+```json
+[
+  {
+    "offerId": 10,
+    "offerTitle": "Vintage Guitar",
+    "categoryName": "Music",
+    "score": 0.95,
+    "reason": "Matches your interest in musical instruments based on previous exchanges"
+  }
+]
+```
+
+**Configuration:**
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `OPENAI_API_KEY` | — | OpenAI API key (required for prod) |
+| `app.recommendation.mock-enabled` | `true` (dev) / `false` (prod) | Use mock recommendations without API key |
+| `app.recommendation.max-results` | `5` | Max recommendations returned |
+| `app.recommendation.max-candidates` | `50` | Max offers sent to LLM for ranking |
+
+In dev profile, recommendations work in mock mode (no API key needed). For real AI recommendations:
+
+```bash
+OPENAI_API_KEY=sk-... ./gradlew bootRun --args='--app.recommendation.mock-enabled=false'
+```
+
 ### Swagger UI
 
 Available at: `http://localhost:8080/swagger-ui.html`
@@ -93,8 +133,8 @@ Available at: `http://localhost:8080/swagger-ui.html`
 
 ```
 src/main/java/com/example/bartexchangeai/
-├── config/          # SecurityConfig, OpenApiConfig, DataInitializer
-├── controller/      # REST controllers (8 + AuthController)
+├── config/          # SecurityConfig, OpenApiConfig, RecommendationConfig, DataInitializer
+├── controller/      # REST controllers (9 + AuthController)
 ├── dto/             # Data Transfer Objects + auth DTOs + ErrorResponse
 ├── exception/       # Custom exceptions + GlobalExceptionHandler
 ├── mapper/          # MapStruct mappers
