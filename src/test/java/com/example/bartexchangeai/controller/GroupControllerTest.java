@@ -98,12 +98,13 @@ class GroupControllerTest {
     @Test
     void searchGroups_returnsResults() throws Exception {
         GroupDto group = new GroupDto(1L, "Техника", "Группа обмена техникой");
-        when(groupService.search(eq("техника"))).thenReturn(List.of(group));
+        when(groupService.search(eq("техника"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(group)));
 
         mockMvc.perform(get("/api/groups/search").param("keyword", "техника"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].name").value("Техника"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].name").value("Техника"));
     }
 
     @Test

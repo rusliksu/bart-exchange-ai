@@ -4,19 +4,17 @@ import com.example.bartexchangeai.dto.ReviewDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface ReviewService {
 
     Page<ReviewDto> findAll(Pageable pageable);
 
     ReviewDto findById(Long id);
 
-    List<ReviewDto> findByReviewerId(Long reviewerId);
+    Page<ReviewDto> findByReviewerId(Long reviewerId, Pageable pageable);
 
-    List<ReviewDto> findByReviewedUserId(Long userId);
+    Page<ReviewDto> findByReviewedUserId(Long userId, Pageable pageable);
 
-    List<ReviewDto> findByExchangeId(Long exchangeId);
+    Page<ReviewDto> findByExchangeId(Long exchangeId, Pageable pageable);
 
     Double getAverageRating(Long userId);
 

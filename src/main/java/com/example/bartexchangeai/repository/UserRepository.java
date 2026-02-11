@@ -1,9 +1,13 @@
 package com.example.bartexchangeai.repository;
 
 import com.example.bartexchangeai.model.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,4 +30,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByGroupId(Long groupId);
 
     boolean existsByIdAndUsername(Long id, String username);
+
+    @Query("SELECT u FROM User u WHERE u.rating >= :minRating")
+    Page<User> findByMinRating(@Param("minRating") Float minRating, Pageable pageable);
 }

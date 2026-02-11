@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,23 +43,23 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public List<ExchangeDto> findByStatus(ExchangeStatus status) {
-        return exchangeMapper.toDtoList(exchangeRepository.findByStatus(status));
+    public Page<ExchangeDto> findByStatus(ExchangeStatus status, Pageable pageable) {
+        return exchangeRepository.findByStatus(status, pageable).map(exchangeMapper::toDto);
     }
 
     @Override
-    public List<ExchangeDto> findByUserId(Long userId) {
-        return exchangeMapper.toDtoList(exchangeRepository.findByUserId(userId));
+    public Page<ExchangeDto> findByUserId(Long userId, Pageable pageable) {
+        return exchangeRepository.findPageByUserId(userId, pageable).map(exchangeMapper::toDto);
     }
 
     @Override
-    public List<ExchangeDto> findByInitiatorId(Long initiatorId) {
-        return exchangeMapper.toDtoList(exchangeRepository.findByInitiatorId(initiatorId));
+    public Page<ExchangeDto> findByInitiatorId(Long initiatorId, Pageable pageable) {
+        return exchangeRepository.findByInitiatorId(initiatorId, pageable).map(exchangeMapper::toDto);
     }
 
     @Override
-    public List<ExchangeDto> findByParticipantId(Long participantId) {
-        return exchangeMapper.toDtoList(exchangeRepository.findByParticipantId(participantId));
+    public Page<ExchangeDto> findByParticipantId(Long participantId, Pageable pageable) {
+        return exchangeRepository.findByParticipantId(participantId, pageable).map(exchangeMapper::toDto);
     }
 
     @Override

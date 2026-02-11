@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
@@ -41,32 +39,32 @@ public class OfferController {
 
     @GetMapping("/status/{status}")
     @Operation(summary = "Get offers by status")
-    public List<OfferDto> getOffersByStatus(@PathVariable OfferStatus status) {
-        return offerService.findByStatus(status);
+    public Page<OfferDto> getOffersByStatus(@PathVariable OfferStatus status, Pageable pageable) {
+        return offerService.findByStatus(status, pageable);
     }
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get offers by user ID")
-    public List<OfferDto> getOffersByUser(@PathVariable Long userId) {
-        return offerService.findByUserId(userId);
+    public Page<OfferDto> getOffersByUser(@PathVariable Long userId, Pageable pageable) {
+        return offerService.findByUserId(userId, pageable);
     }
 
     @GetMapping("/category/{categoryId}")
     @Operation(summary = "Get offers by category ID")
-    public List<OfferDto> getOffersByCategory(@PathVariable Long categoryId) {
-        return offerService.findByCategoryId(categoryId);
+    public Page<OfferDto> getOffersByCategory(@PathVariable Long categoryId, Pageable pageable) {
+        return offerService.findByCategoryId(categoryId, pageable);
     }
 
     @GetMapping("/search")
     @Operation(summary = "Search offers by keyword")
-    public List<OfferDto> searchOffers(@RequestParam @Size(min = 1, max = 100) String keyword) {
-        return offerService.search(keyword);
+    public Page<OfferDto> searchOffers(@RequestParam @Size(min = 1, max = 100) String keyword, Pageable pageable) {
+        return offerService.search(keyword, pageable);
     }
 
     @GetMapping("/active")
     @Operation(summary = "Get active offers sorted by newest")
-    public List<OfferDto> getActiveOffers() {
-        return offerService.findActive();
+    public Page<OfferDto> getActiveOffers(Pageable pageable) {
+        return offerService.findActive(pageable);
     }
 
     @PostMapping

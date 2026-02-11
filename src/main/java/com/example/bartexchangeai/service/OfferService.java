@@ -5,23 +5,21 @@ import com.example.bartexchangeai.model.offer.OfferStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface OfferService {
 
     Page<OfferDto> findAll(Pageable pageable);
 
     OfferDto findById(Long id);
 
-    List<OfferDto> findByStatus(OfferStatus status);
+    Page<OfferDto> findByStatus(OfferStatus status, Pageable pageable);
 
-    List<OfferDto> findByUserId(Long userId);
+    Page<OfferDto> findByUserId(Long userId, Pageable pageable);
 
-    List<OfferDto> findByCategoryId(Long categoryId);
+    Page<OfferDto> findByCategoryId(Long categoryId, Pageable pageable);
 
-    List<OfferDto> search(String keyword);
+    Page<OfferDto> search(String keyword, Pageable pageable);
 
-    List<OfferDto> findActive();
+    Page<OfferDto> findActive(Pageable pageable);
 
     OfferDto create(OfferDto offerDto);
 

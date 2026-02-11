@@ -13,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -43,8 +41,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findByMinRating(Float minRating) {
-        return userMapper.toDtoList(userRepository.findByRatingGreaterThanEqualOrderByRatingDesc(minRating));
+    public Page<UserDto> findByMinRating(Float minRating, Pageable pageable) {
+        return userRepository.findByMinRating(minRating, pageable).map(userMapper::toDto);
     }
 
     @Override
@@ -65,9 +63,19 @@ public class UserServiceImpl implements UserService {
     public UserDto update(Long id, UserDto userDto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
+
+        if (!user.getUsername().equals(userDto.getUsername())
+                && userRepository.existsByUsername(userDto.getUsername())) {
+            throw new DuplicateResourceException("Username уже занят: " + userDto.getUsername());
+        }
+        if (!user.getEmail().equals(userDto.getEmail())
+                && userRepository.existsByEmail(userDto.getEmail())) {
+            throw new DuplicateResourceException("Email уже занят: " + userDto.getEmail());
+        }
+
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
-        user.setRating(userDto.getRating());
+        // rating обновляется только через отзывы, не через API
         return userMapper.toDto(userRepository.save(user));
     }
 

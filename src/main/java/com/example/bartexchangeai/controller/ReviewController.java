@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
@@ -37,20 +35,20 @@ public class ReviewController {
 
     @GetMapping("/reviewer/{reviewerId}")
     @Operation(summary = "Get reviews by reviewer ID")
-    public List<ReviewDto> getReviewsByReviewer(@PathVariable Long reviewerId) {
-        return reviewService.findByReviewerId(reviewerId);
+    public Page<ReviewDto> getReviewsByReviewer(@PathVariable Long reviewerId, Pageable pageable) {
+        return reviewService.findByReviewerId(reviewerId, pageable);
     }
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get reviews for a user")
-    public List<ReviewDto> getReviewsForUser(@PathVariable Long userId) {
-        return reviewService.findByReviewedUserId(userId);
+    public Page<ReviewDto> getReviewsForUser(@PathVariable Long userId, Pageable pageable) {
+        return reviewService.findByReviewedUserId(userId, pageable);
     }
 
     @GetMapping("/exchange/{exchangeId}")
     @Operation(summary = "Get reviews for an exchange")
-    public List<ReviewDto> getReviewsByExchange(@PathVariable Long exchangeId) {
-        return reviewService.findByExchangeId(exchangeId);
+    public Page<ReviewDto> getReviewsByExchange(@PathVariable Long exchangeId, Pageable pageable) {
+        return reviewService.findByExchangeId(exchangeId, pageable);
     }
 
     @GetMapping("/user/{userId}/average")

@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
@@ -37,14 +35,14 @@ public class MessageController {
 
     @GetMapping("/exchange/{exchangeId}")
     @Operation(summary = "Get messages by exchange ID")
-    public List<MessageDto> getMessagesByExchange(@PathVariable Long exchangeId) {
-        return messageService.findByExchangeId(exchangeId);
+    public Page<MessageDto> getMessagesByExchange(@PathVariable Long exchangeId, Pageable pageable) {
+        return messageService.findByExchangeId(exchangeId, pageable);
     }
 
     @GetMapping("/sender/{senderId}")
     @Operation(summary = "Get messages by sender ID")
-    public List<MessageDto> getMessagesBySender(@PathVariable Long senderId) {
-        return messageService.findBySenderId(senderId);
+    public Page<MessageDto> getMessagesBySender(@PathVariable Long senderId, Pageable pageable) {
+        return messageService.findBySenderId(senderId, pageable);
     }
 
     @PostMapping

@@ -4,8 +4,6 @@ import com.example.bartexchangeai.dto.UserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface UserService {
 
     Page<UserDto> findAll(Pageable pageable);
@@ -14,7 +12,7 @@ public interface UserService {
 
     UserDto findByUsername(String username);
 
-    List<UserDto> findByMinRating(Float minRating);
+    Page<UserDto> findByMinRating(Float minRating, Pageable pageable);
 
     UserDto create(UserDto userDto);
 

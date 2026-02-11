@@ -96,7 +96,8 @@ class OfferServiceImplTest {
     }
 
     @Test
-    void findByStatus_returnsList() {
+    void findByStatus_returnsPage() {
+        Pageable pageable = PageRequest.of(0, 10);
         Offer offer = new Offer();
         offer.setId(1L);
         offer.setTitle("Ноутбук");
@@ -104,15 +105,16 @@ class OfferServiceImplTest {
 
         OfferDto offerDto = new OfferDto(1L, "Ноутбук", "Описание", OfferStatus.ACTIVE, 1L, 1L, null);
 
-        when(offerRepository.findByStatus(OfferStatus.ACTIVE)).thenReturn(List.of(offer));
-        when(offerMapper.toDtoList(List.of(offer))).thenReturn(List.of(offerDto));
+        Page<Offer> offerPage = new PageImpl<>(List.of(offer));
+        when(offerRepository.findByStatus(OfferStatus.ACTIVE, pageable)).thenReturn(offerPage);
+        when(offerMapper.toDto(offer)).thenReturn(offerDto);
 
-        List<OfferDto> result = offerService.findByStatus(OfferStatus.ACTIVE);
+        Page<OfferDto> result = offerService.findByStatus(OfferStatus.ACTIVE, pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(OfferStatus.ACTIVE, result.get(0).getStatus());
-        verify(offerRepository).findByStatus(OfferStatus.ACTIVE);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(OfferStatus.ACTIVE, result.getContent().get(0).getStatus());
+        verify(offerRepository).findByStatus(OfferStatus.ACTIVE, pageable);
     }
 
     @Test

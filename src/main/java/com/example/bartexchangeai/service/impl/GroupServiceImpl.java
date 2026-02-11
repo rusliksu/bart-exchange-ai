@@ -13,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -43,13 +41,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupDto> findByMemberId(Long userId) {
-        return groupMapper.toDtoList(groupRepository.findByMemberId(userId));
+    public Page<GroupDto> findByMemberId(Long userId, Pageable pageable) {
+        return groupRepository.findPageByMemberId(userId, pageable).map(groupMapper::toDto);
     }
 
     @Override
-    public List<GroupDto> search(String keyword) {
-        return groupMapper.toDtoList(groupRepository.findByNameOrDescriptionContaining(keyword));
+    public Page<GroupDto> search(String keyword, Pageable pageable) {
+        return groupRepository.searchByKeyword(keyword, pageable).map(groupMapper::toDto);
     }
 
     @Override

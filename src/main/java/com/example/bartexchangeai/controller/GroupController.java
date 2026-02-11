@@ -15,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/groups")
 @RequiredArgsConstructor
@@ -46,14 +44,14 @@ public class GroupController {
 
     @GetMapping("/member/{userId}")
     @Operation(summary = "Get groups by member user ID")
-    public List<GroupDto> getGroupsByMember(@PathVariable Long userId) {
-        return groupService.findByMemberId(userId);
+    public Page<GroupDto> getGroupsByMember(@PathVariable Long userId, Pageable pageable) {
+        return groupService.findByMemberId(userId, pageable);
     }
 
     @GetMapping("/search")
     @Operation(summary = "Search groups by keyword")
-    public List<GroupDto> searchGroups(@RequestParam @Size(min = 1, max = 100) String keyword) {
-        return groupService.search(keyword);
+    public Page<GroupDto> searchGroups(@RequestParam @Size(min = 1, max = 100) String keyword, Pageable pageable) {
+        return groupService.search(keyword, pageable);
     }
 
     @PostMapping

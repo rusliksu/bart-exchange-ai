@@ -4,17 +4,15 @@ import com.example.bartexchangeai.dto.MessageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface MessageService {
 
     Page<MessageDto> findAll(Pageable pageable);
 
     MessageDto findById(Long id);
 
-    List<MessageDto> findByExchangeId(Long exchangeId);
+    Page<MessageDto> findByExchangeId(Long exchangeId, Pageable pageable);
 
-    List<MessageDto> findBySenderId(Long senderId);
+    Page<MessageDto> findBySenderId(Long senderId, Pageable pageable);
 
     MessageDto create(MessageDto messageDto);
 
