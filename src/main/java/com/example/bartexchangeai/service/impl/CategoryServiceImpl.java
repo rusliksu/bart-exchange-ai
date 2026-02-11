@@ -8,11 +8,13 @@ import com.example.bartexchangeai.model.offer.Category;
 import com.example.bartexchangeai.repository.CategoryRepository;
 import com.example.bartexchangeai.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -47,7 +49,9 @@ public class CategoryServiceImpl implements CategoryService {
             throw new DuplicateResourceException("Категория с name=" + categoryDto.getName() + " уже существует");
         }
         Category category = categoryMapper.toEntity(categoryDto);
-        return categoryMapper.toDto(categoryRepository.save(category));
+        Category saved = categoryRepository.save(category);
+        log.info("Category created: id={}, name={}", saved.getId(), saved.getName());
+        return categoryMapper.toDto(saved);
     }
 
     @Override
@@ -56,6 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", id));
         category.setName(categoryDto.getName());
+        log.info("Category updated: id={}", id);
         return categoryMapper.toDto(categoryRepository.save(category));
     }
 
@@ -66,5 +71,6 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceNotFoundException("Category", id);
         }
         categoryRepository.deleteById(id);
+        log.warn("Category deleted: id={}", id);
     }
 }

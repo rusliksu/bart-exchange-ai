@@ -4,6 +4,7 @@ import com.example.bartexchangeai.dto.auth.AuthResponse;
 import com.example.bartexchangeai.dto.auth.LoginRequest;
 import com.example.bartexchangeai.dto.auth.RegisterRequest;
 import com.example.bartexchangeai.exception.DuplicateResourceException;
+import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.model.user.Role;
 import com.example.bartexchangeai.model.user.User;
 import com.example.bartexchangeai.repository.UserRepository;
@@ -68,7 +69,8 @@ public class AuthController {
 
         String token = jwtTokenProvider.generateToken(authentication);
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с username=" + request.getUsername() + " не найден"));
         return new AuthResponse(token, user.getUsername(), user.getRole().name());
     }
 }

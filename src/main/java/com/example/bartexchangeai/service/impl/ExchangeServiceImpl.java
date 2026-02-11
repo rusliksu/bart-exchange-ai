@@ -68,7 +68,7 @@ public class ExchangeServiceImpl implements ExchangeService {
     @Transactional
     public ExchangeDto create(ExchangeDto exchangeDto) {
         if (exchangeDto.getInitiatorId().equals(exchangeDto.getParticipantId())) {
-            throw new InvalidOperationException("Initiator and participant cannot be the same user");
+            throw new InvalidOperationException("Инициатор и участник не могут быть одним пользователем");
         }
         if (!userRepository.existsById(exchangeDto.getInitiatorId())) {
             throw new ResourceNotFoundException("User", exchangeDto.getInitiatorId());
@@ -79,7 +79,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         Offer offer = offerRepository.findById(exchangeDto.getOfferId())
                 .orElseThrow(() -> new ResourceNotFoundException("Offer", exchangeDto.getOfferId()));
         if (offer.getStatus() != OfferStatus.ACTIVE) {
-            throw new InvalidOperationException("Cannot create exchange for non-active offer");
+            throw new InvalidOperationException("Нельзя создать обмен для неактивного предложения");
         }
         Exchange exchange = exchangeMapper.toEntity(exchangeDto);
         exchange.setDate(LocalDateTime.now());
@@ -108,7 +108,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         Exchange exchange = exchangeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exchange", id));
         if (exchange.getStatus() != ExchangeStatus.PENDING) {
-            throw new InvalidOperationException("Can only complete exchanges with PENDING status");
+            throw new InvalidOperationException("Завершить можно только обмен в статусе PENDING");
         }
         exchange.setStatus(ExchangeStatus.COMPLETED);
         log.info("Exchange completed: id={}", id);
@@ -121,7 +121,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         Exchange exchange = exchangeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exchange", id));
         if (exchange.getStatus() != ExchangeStatus.PENDING) {
-            throw new InvalidOperationException("Can only cancel exchanges with PENDING status");
+            throw new InvalidOperationException("Отменить можно только обмен в статусе PENDING");
         }
         exchange.setStatus(ExchangeStatus.CANCELLED);
         log.info("Exchange cancelled: id={}", id);
