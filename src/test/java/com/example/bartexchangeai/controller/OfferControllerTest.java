@@ -6,6 +6,7 @@ import com.example.bartexchangeai.model.offer.OfferStatus;
 import com.example.bartexchangeai.service.OfferService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +40,8 @@ class OfferControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -79,6 +82,7 @@ class OfferControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createOffer_valid() throws Exception {
         OfferDto inputDto = new OfferDto(null, "Телефон", "Новый телефон", OfferStatus.ACTIVE, 1L, 2L, null);
         OfferDto savedDto = new OfferDto(1L, "Телефон", "Новый телефон", OfferStatus.ACTIVE, 1L, 2L, null);
@@ -104,6 +108,7 @@ class OfferControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteOffer_success() throws Exception {
         doNothing().when(offerService).delete(1L);
 

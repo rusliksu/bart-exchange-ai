@@ -5,6 +5,7 @@ import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +40,8 @@ class MessageControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -93,6 +96,7 @@ class MessageControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createMessage_valid() throws Exception {
         MessageDto inputDto = new MessageDto(null, "Новое сообщение", null, 1L, 1L);
         MessageDto savedDto = new MessageDto(1L, "Новое сообщение", LocalDateTime.now(), 1L, 1L);
@@ -107,6 +111,7 @@ class MessageControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteMessage_success() throws Exception {
         doNothing().when(messageService).delete(1L);
 

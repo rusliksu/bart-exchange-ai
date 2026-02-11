@@ -5,10 +5,13 @@ import com.example.bartexchangeai.service.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/groups")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Groups", description = "Group management API")
 public class GroupController {
 
@@ -47,24 +51,27 @@ public class GroupController {
 
     @GetMapping("/search")
     @Operation(summary = "Search groups by keyword")
-    public List<GroupDto> searchGroups(@RequestParam String keyword) {
+    public List<GroupDto> searchGroups(@RequestParam @Size(min = 1, max = 100) String keyword) {
         return groupService.search(keyword);
     }
 
     @PostMapping
     @Operation(summary = "Create a new group")
+    @PreAuthorize("hasRole('ADMIN')")
     public GroupDto createGroup(@Valid @RequestBody GroupDto groupDto) {
         return groupService.create(groupDto);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a group")
+    @PreAuthorize("hasRole('ADMIN')")
     public GroupDto updateGroup(@PathVariable Long id, @Valid @RequestBody GroupDto groupDto) {
         return groupService.update(id, groupDto);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a group")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
         groupService.delete(id);
         return ResponseEntity.noContent().build();

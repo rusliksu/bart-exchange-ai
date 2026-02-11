@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -65,12 +66,14 @@ public class ReviewController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a review")
+    @PreAuthorize("@authz.isReviewAuthor(#id, authentication.name) or hasRole('ADMIN')")
     public ReviewDto updateReview(@PathVariable Long id, @Valid @RequestBody ReviewDto reviewDto) {
         return reviewService.update(id, reviewDto);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a review")
+    @PreAuthorize("@authz.isReviewAuthor(#id, authentication.name) or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
         reviewService.delete(id);
         return ResponseEntity.noContent().build();

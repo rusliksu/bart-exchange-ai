@@ -6,6 +6,7 @@ import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import com.example.bartexchangeai.service.ExchangeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +40,8 @@ class ExchangeControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -80,6 +83,7 @@ class ExchangeControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createExchange_valid() throws Exception {
         ExchangeDto inputDto = new ExchangeDto(null, null, null, 1L, 2L, 1L);
         ExchangeDto savedDto = new ExchangeDto(1L, ExchangeStatus.PENDING, LocalDateTime.now(), 1L, 2L, 1L);
@@ -94,6 +98,7 @@ class ExchangeControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void completeExchange_success() throws Exception {
         ExchangeDto completedDto = new ExchangeDto(1L, ExchangeStatus.COMPLETED, LocalDateTime.now(), 1L, 2L, 1L);
         when(exchangeService.complete(1L)).thenReturn(completedDto);
@@ -105,6 +110,7 @@ class ExchangeControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteExchange_success() throws Exception {
         doNothing().when(exchangeService).delete(1L);
 

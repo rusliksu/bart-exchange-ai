@@ -5,6 +5,7 @@ import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.service.GroupService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,6 +39,8 @@ class GroupControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -78,6 +81,7 @@ class GroupControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createGroup_valid() throws Exception {
         GroupDto inputDto = new GroupDto(null, "Книги", "Группа обмена книгами");
         GroupDto savedDto = new GroupDto(1L, "Книги", "Группа обмена книгами");
@@ -103,6 +107,7 @@ class GroupControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteGroup_success() throws Exception {
         doNothing().when(groupService).delete(1L);
 

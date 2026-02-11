@@ -5,6 +5,7 @@ import com.example.bartexchangeai.exception.ResourceNotFoundException;
 import com.example.bartexchangeai.service.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +40,8 @@ class ReviewControllerTest {
 
     @MockitoBean
     private com.example.bartexchangeai.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private com.example.bartexchangeai.security.AuthorizationService authorizationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -79,6 +82,7 @@ class ReviewControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createReview_valid() throws Exception {
         ReviewDto inputDto = new ReviewDto(null, "Хороший обмен", 4, null, 1L, 2L, 1L);
         ReviewDto savedDto = new ReviewDto(1L, "Хороший обмен", 4, LocalDateTime.now(), 1L, 2L, 1L);
@@ -102,6 +106,7 @@ class ReviewControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteReview_success() throws Exception {
         doNothing().when(reviewService).delete(1L);
 

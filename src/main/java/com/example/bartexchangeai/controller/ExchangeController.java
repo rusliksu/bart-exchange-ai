@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -66,24 +67,28 @@ public class ExchangeController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update exchange status")
+    @PreAuthorize("@authz.isExchangeParticipant(#id, authentication.name) or hasRole('ADMIN')")
     public ExchangeDto updateExchange(@PathVariable Long id, @Valid @RequestBody ExchangeDto exchangeDto) {
         return exchangeService.updateStatus(id, exchangeDto.getStatus());
     }
 
     @PutMapping("/complete/{id}")
     @Operation(summary = "Mark exchange as completed")
+    @PreAuthorize("@authz.isExchangeParticipant(#id, authentication.name) or hasRole('ADMIN')")
     public ExchangeDto completeExchange(@PathVariable Long id) {
         return exchangeService.complete(id);
     }
 
     @PutMapping("/cancel/{id}")
     @Operation(summary = "Cancel an exchange")
+    @PreAuthorize("@authz.isExchangeParticipant(#id, authentication.name) or hasRole('ADMIN')")
     public ExchangeDto cancelExchange(@PathVariable Long id) {
         return exchangeService.cancel(id);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an exchange")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteExchange(@PathVariable Long id) {
         exchangeService.delete(id);
         return ResponseEntity.noContent().build();
