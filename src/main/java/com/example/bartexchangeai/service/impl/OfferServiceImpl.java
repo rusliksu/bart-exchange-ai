@@ -10,11 +10,13 @@ import com.example.bartexchangeai.repository.OfferRepository;
 import com.example.bartexchangeai.repository.UserRepository;
 import com.example.bartexchangeai.service.OfferService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -72,7 +74,9 @@ public class OfferServiceImpl implements OfferService {
             throw new ResourceNotFoundException("Category", offerDto.getCategoryId());
         }
         Offer offer = offerMapper.toEntity(offerDto);
-        return offerMapper.toDto(offerRepository.save(offer));
+        Offer saved = offerRepository.save(offer);
+        log.info("Offer created: id={}, title={}", saved.getId(), saved.getTitle());
+        return offerMapper.toDto(saved);
     }
 
     @Override
@@ -87,6 +91,7 @@ public class OfferServiceImpl implements OfferService {
             categoryRepository.findById(offerDto.getCategoryId())
                     .ifPresent(offer::setCategory);
         }
+        log.info("Offer updated: id={}", id);
         return offerMapper.toDto(offerRepository.save(offer));
     }
 
@@ -97,5 +102,6 @@ public class OfferServiceImpl implements OfferService {
             throw new ResourceNotFoundException("Offer", id);
         }
         offerRepository.deleteById(id);
+        log.warn("Offer deleted: id={}", id);
     }
 }

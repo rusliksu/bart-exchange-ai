@@ -13,6 +13,7 @@ import com.example.bartexchangeai.repository.OfferRepository;
 import com.example.bartexchangeai.repository.UserRepository;
 import com.example.bartexchangeai.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -84,7 +86,10 @@ public class ExchangeServiceImpl implements ExchangeService {
         if (exchange.getStatus() == null) {
             exchange.setStatus(ExchangeStatus.PENDING);
         }
-        return exchangeMapper.toDto(exchangeRepository.save(exchange));
+        Exchange saved = exchangeRepository.save(exchange);
+        log.info("Exchange created: id={}, initiator={}, participant={}, offer={}",
+                saved.getId(), exchangeDto.getInitiatorId(), exchangeDto.getParticipantId(), exchangeDto.getOfferId());
+        return exchangeMapper.toDto(saved);
     }
 
     @Override
@@ -93,6 +98,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         Exchange exchange = exchangeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exchange", id));
         exchange.setStatus(status);
+        log.info("Exchange status updated: id={}, status={}", id, status);
         return exchangeMapper.toDto(exchangeRepository.save(exchange));
     }
 
@@ -105,6 +111,7 @@ public class ExchangeServiceImpl implements ExchangeService {
             throw new InvalidOperationException("Can only complete exchanges with PENDING status");
         }
         exchange.setStatus(ExchangeStatus.COMPLETED);
+        log.info("Exchange completed: id={}", id);
         return exchangeMapper.toDto(exchangeRepository.save(exchange));
     }
 
@@ -117,6 +124,7 @@ public class ExchangeServiceImpl implements ExchangeService {
             throw new InvalidOperationException("Can only cancel exchanges with PENDING status");
         }
         exchange.setStatus(ExchangeStatus.CANCELLED);
+        log.info("Exchange cancelled: id={}", id);
         return exchangeMapper.toDto(exchangeRepository.save(exchange));
     }
 
@@ -127,5 +135,6 @@ public class ExchangeServiceImpl implements ExchangeService {
             throw new ResourceNotFoundException("Exchange", id);
         }
         exchangeRepository.deleteById(id);
+        log.warn("Exchange deleted: id={}", id);
     }
 }

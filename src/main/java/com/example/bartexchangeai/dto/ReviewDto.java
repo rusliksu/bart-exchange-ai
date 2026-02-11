@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 /**
@@ -19,6 +20,7 @@ public class ReviewDto {
     
     private Long id;
     
+    @Size(max = 2000, message = "Комментарий не должен превышать 2000 символов")
     private String comment;
     
     @NotNull(message = "Рейтинг обязателен")

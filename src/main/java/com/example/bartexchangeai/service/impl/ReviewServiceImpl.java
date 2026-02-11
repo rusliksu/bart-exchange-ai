@@ -8,11 +8,13 @@ import com.example.bartexchangeai.model.user.Review;
 import com.example.bartexchangeai.repository.ReviewRepository;
 import com.example.bartexchangeai.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -62,7 +64,9 @@ public class ReviewServiceImpl implements ReviewService {
             throw new DuplicateResourceException("Отзыв от данного пользователя для этого обмена уже существует");
         }
         Review review = reviewMapper.toEntity(reviewDto);
-        return reviewMapper.toDto(reviewRepository.save(review));
+        Review saved = reviewRepository.save(review);
+        log.info("Review created: id={}, reviewer={}, rating={}", saved.getId(), reviewDto.getReviewerId(), reviewDto.getRating());
+        return reviewMapper.toDto(saved);
     }
 
     @Override
@@ -72,6 +76,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException("Review", id));
         review.setRating(reviewDto.getRating());
         review.setComment(reviewDto.getComment());
+        log.info("Review updated: id={}, rating={}", id, reviewDto.getRating());
         return reviewMapper.toDto(reviewRepository.save(review));
     }
 
@@ -82,5 +87,6 @@ public class ReviewServiceImpl implements ReviewService {
             throw new ResourceNotFoundException("Review", id);
         }
         reviewRepository.deleteById(id);
+        log.warn("Review deleted: id={}", id);
     }
 }
