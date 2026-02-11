@@ -16,6 +16,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +36,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
-    public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("Username уже занят: " + request.getUsername());
         }
@@ -54,7 +56,8 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         String token = jwtTokenProvider.generateToken(authentication);
-        return new AuthResponse(token, user.getUsername(), user.getRole().name());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new AuthResponse(token, user.getUsername(), user.getRole().name()));
     }
 
     @PostMapping("/login")

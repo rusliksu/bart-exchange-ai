@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,8 +62,8 @@ public class ExchangeController {
 
     @PostMapping
     @Operation(summary = "Create a new exchange")
-    public ExchangeDto createExchange(@Valid @RequestBody ExchangeDto exchangeDto) {
-        return exchangeService.create(exchangeDto);
+    public ResponseEntity<ExchangeDto> createExchange(@Valid @RequestBody ExchangeDto exchangeDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(exchangeService.create(exchangeDto));
     }
 
     @PutMapping("/{id}")

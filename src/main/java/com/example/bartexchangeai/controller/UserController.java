@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,8 +49,8 @@ public class UserController {
 
     @PostMapping
     @Operation(summary = "Create a new user")
-    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
-        return userService.create(userDto);
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userDto));
     }
 
     @PutMapping("/{id}")
