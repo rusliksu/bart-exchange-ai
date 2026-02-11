@@ -5,21 +5,19 @@ import com.example.bartexchangeai.model.exchange.ExchangeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface ExchangeService {
 
     Page<ExchangeDto> findAll(Pageable pageable);
 
     ExchangeDto findById(Long id);
 
-    List<ExchangeDto> findByStatus(ExchangeStatus status);
+    Page<ExchangeDto> findByStatus(ExchangeStatus status, Pageable pageable);
 
-    List<ExchangeDto> findByUserId(Long userId);
+    Page<ExchangeDto> findByUserId(Long userId, Pageable pageable);
 
-    List<ExchangeDto> findByInitiatorId(Long initiatorId);
+    Page<ExchangeDto> findByInitiatorId(Long initiatorId, Pageable pageable);
 
-    List<ExchangeDto> findByParticipantId(Long participantId);
+    Page<ExchangeDto> findByParticipantId(Long participantId, Pageable pageable);
 
     ExchangeDto create(ExchangeDto exchangeDto);
 

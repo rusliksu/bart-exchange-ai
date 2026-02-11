@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/exchanges")
 @RequiredArgsConstructor
@@ -38,26 +36,26 @@ public class ExchangeController {
 
     @GetMapping("/status/{status}")
     @Operation(summary = "Get exchanges by status")
-    public List<ExchangeDto> getExchangesByStatus(@PathVariable ExchangeStatus status) {
-        return exchangeService.findByStatus(status);
+    public Page<ExchangeDto> getExchangesByStatus(@PathVariable ExchangeStatus status, Pageable pageable) {
+        return exchangeService.findByStatus(status, pageable);
     }
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get exchanges by user ID")
-    public List<ExchangeDto> getExchangesByUser(@PathVariable Long userId) {
-        return exchangeService.findByUserId(userId);
+    public Page<ExchangeDto> getExchangesByUser(@PathVariable Long userId, Pageable pageable) {
+        return exchangeService.findByUserId(userId, pageable);
     }
 
     @GetMapping("/initiator/{initiatorId}")
     @Operation(summary = "Get exchanges by initiator ID")
-    public List<ExchangeDto> getExchangesByInitiator(@PathVariable Long initiatorId) {
-        return exchangeService.findByInitiatorId(initiatorId);
+    public Page<ExchangeDto> getExchangesByInitiator(@PathVariable Long initiatorId, Pageable pageable) {
+        return exchangeService.findByInitiatorId(initiatorId, pageable);
     }
 
     @GetMapping("/participant/{participantId}")
     @Operation(summary = "Get exchanges by participant ID")
-    public List<ExchangeDto> getExchangesByParticipant(@PathVariable Long participantId) {
-        return exchangeService.findByParticipantId(participantId);
+    public Page<ExchangeDto> getExchangesByParticipant(@PathVariable Long participantId, Pageable pageable) {
+        return exchangeService.findByParticipantId(participantId, pageable);
     }
 
     @PostMapping

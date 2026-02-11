@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +39,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageDto> findByExchangeId(Long exchangeId) {
-        return messageMapper.toDtoList(messageRepository.findByExchangeIdOrderByTimestampAsc(exchangeId));
+    public Page<MessageDto> findByExchangeId(Long exchangeId, Pageable pageable) {
+        return messageRepository.findPageByExchangeId(exchangeId, pageable).map(messageMapper::toDto);
     }
 
     @Override
-    public List<MessageDto> findBySenderId(Long senderId) {
-        return messageMapper.toDtoList(messageRepository.findBySenderId(senderId));
+    public Page<MessageDto> findBySenderId(Long senderId, Pageable pageable) {
+        return messageRepository.findBySenderId(senderId, pageable).map(messageMapper::toDto);
     }
 
     @Override

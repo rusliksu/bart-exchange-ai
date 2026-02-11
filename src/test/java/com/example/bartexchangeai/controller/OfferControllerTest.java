@@ -99,12 +99,13 @@ class OfferControllerTest {
     @Test
     void searchOffers_returnsResults() throws Exception {
         OfferDto offer = new OfferDto(1L, "Ноутбук Lenovo", "Игровой ноутбук", OfferStatus.ACTIVE, 1L, 1L, null);
-        when(offerService.search(eq("ноутбук"))).thenReturn(List.of(offer));
+        when(offerService.search(eq("ноутбук"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(offer)));
 
         mockMvc.perform(get("/api/offers/search").param("keyword", "ноутбук"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].title").value("Ноутбук Lenovo"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].title").value("Ноутбук Lenovo"));
     }
 
     @Test

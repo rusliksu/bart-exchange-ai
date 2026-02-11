@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -40,28 +38,28 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public List<OfferDto> findByStatus(OfferStatus status) {
-        return offerMapper.toDtoList(offerRepository.findByStatus(status));
+    public Page<OfferDto> findByStatus(OfferStatus status, Pageable pageable) {
+        return offerRepository.findByStatus(status, pageable).map(offerMapper::toDto);
     }
 
     @Override
-    public List<OfferDto> findByUserId(Long userId) {
-        return offerMapper.toDtoList(offerRepository.findByUserId(userId));
+    public Page<OfferDto> findByUserId(Long userId, Pageable pageable) {
+        return offerRepository.findByUserId(userId, pageable).map(offerMapper::toDto);
     }
 
     @Override
-    public List<OfferDto> findByCategoryId(Long categoryId) {
-        return offerMapper.toDtoList(offerRepository.findByCategoryId(categoryId));
+    public Page<OfferDto> findByCategoryId(Long categoryId, Pageable pageable) {
+        return offerRepository.findByCategoryId(categoryId, pageable).map(offerMapper::toDto);
     }
 
     @Override
-    public List<OfferDto> search(String keyword) {
-        return offerMapper.toDtoList(offerRepository.findByTitleOrDescriptionContaining(keyword));
+    public Page<OfferDto> search(String keyword, Pageable pageable) {
+        return offerRepository.searchByKeyword(keyword, pageable).map(offerMapper::toDto);
     }
 
     @Override
-    public List<OfferDto> findActive() {
-        return offerMapper.toDtoList(offerRepository.findActiveOffersOrderByNewest());
+    public Page<OfferDto> findActive(Pageable pageable) {
+        return offerRepository.findActiveOffers(pageable).map(offerMapper::toDto);
     }
 
     @Override

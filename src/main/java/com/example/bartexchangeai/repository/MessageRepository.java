@@ -1,6 +1,8 @@
 package com.example.bartexchangeai.repository;
 
 import com.example.bartexchangeai.model.exchange.Message;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,4 +26,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     @Query("SELECT COUNT(m) > 0 FROM Message m WHERE m.id = :messageId AND m.sender.username = :username")
     boolean existsByIdAndSenderUsername(@Param("messageId") Long messageId, @Param("username") String username);
+
+    Page<Message> findBySenderId(Long senderId, Pageable pageable);
+
+    @Query("SELECT m FROM Message m WHERE m.exchange.id = :exchangeId")
+    Page<Message> findPageByExchangeId(@Param("exchangeId") Long exchangeId, Pageable pageable);
 }

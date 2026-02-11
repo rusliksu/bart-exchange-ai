@@ -82,17 +82,18 @@ class MessageControllerTest {
     }
 
     @Test
-    void getMessagesByExchange_returnsList() throws Exception {
+    void getMessagesByExchange_returnsPage() throws Exception {
         MessageDto msg1 = new MessageDto(1L, "Привет!", LocalDateTime.now(), 1L, 5L);
         MessageDto msg2 = new MessageDto(2L, "Здравствуйте!", LocalDateTime.now(), 2L, 5L);
-        when(messageService.findByExchangeId(eq(5L))).thenReturn(List.of(msg1, msg2));
+        when(messageService.findByExchangeId(eq(5L), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(msg1, msg2)));
 
         mockMvc.perform(get("/api/messages/exchange/5"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].content").value("Привет!"))
-                .andExpect(jsonPath("$[1].content").value("Здравствуйте!"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].content").value("Привет!"))
+                .andExpect(jsonPath("$.content[1].content").value("Здравствуйте!"));
     }
 
     @Test

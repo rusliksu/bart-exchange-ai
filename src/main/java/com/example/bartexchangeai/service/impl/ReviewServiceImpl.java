@@ -13,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,18 +34,18 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewDto> findByReviewerId(Long reviewerId) {
-        return reviewMapper.toDtoList(reviewRepository.findByReviewerId(reviewerId));
+    public Page<ReviewDto> findByReviewerId(Long reviewerId, Pageable pageable) {
+        return reviewRepository.findByReviewerId(reviewerId, pageable).map(reviewMapper::toDto);
     }
 
     @Override
-    public List<ReviewDto> findByReviewedUserId(Long userId) {
-        return reviewMapper.toDtoList(reviewRepository.findByReviewedUserIdOrderByIdDesc(userId));
+    public Page<ReviewDto> findByReviewedUserId(Long userId, Pageable pageable) {
+        return reviewRepository.findByReviewedUserId(userId, pageable).map(reviewMapper::toDto);
     }
 
     @Override
-    public List<ReviewDto> findByExchangeId(Long exchangeId) {
-        return reviewMapper.toDtoList(reviewRepository.findByExchangeId(exchangeId));
+    public Page<ReviewDto> findByExchangeId(Long exchangeId, Pageable pageable) {
+        return reviewRepository.findByExchangeId(exchangeId, pageable).map(reviewMapper::toDto);
     }
 
     @Override

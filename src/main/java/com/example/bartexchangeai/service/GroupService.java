@@ -4,8 +4,6 @@ import com.example.bartexchangeai.dto.GroupDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface GroupService {
 
     Page<GroupDto> findAll(Pageable pageable);
@@ -14,9 +12,9 @@ public interface GroupService {
 
     GroupDto findByName(String name);
 
-    List<GroupDto> findByMemberId(Long userId);
+    Page<GroupDto> findByMemberId(Long userId, Pageable pageable);
 
-    List<GroupDto> search(String keyword);
+    Page<GroupDto> search(String keyword, Pageable pageable);
 
     GroupDto create(GroupDto groupDto);
 

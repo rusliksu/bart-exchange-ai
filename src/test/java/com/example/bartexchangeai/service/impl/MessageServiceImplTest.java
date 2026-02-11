@@ -95,7 +95,8 @@ class MessageServiceImplTest {
     }
 
     @Test
-    void findByExchangeId_returnsList() {
+    void findByExchangeId_returnsPage() {
+        Pageable pageable = PageRequest.of(0, 10);
         Message message = new Message();
         message.setId(1L);
         message.setContent("Привет!");
@@ -103,15 +104,16 @@ class MessageServiceImplTest {
 
         MessageDto messageDto = new MessageDto(1L, "Привет!", LocalDateTime.now(), 1L, 5L);
 
-        when(messageRepository.findByExchangeIdOrderByTimestampAsc(5L)).thenReturn(List.of(message));
-        when(messageMapper.toDtoList(List.of(message))).thenReturn(List.of(messageDto));
+        Page<Message> messagePage = new PageImpl<>(List.of(message));
+        when(messageRepository.findPageByExchangeId(5L, pageable)).thenReturn(messagePage);
+        when(messageMapper.toDto(message)).thenReturn(messageDto);
 
-        List<MessageDto> result = messageService.findByExchangeId(5L);
+        Page<MessageDto> result = messageService.findByExchangeId(5L, pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Привет!", result.get(0).getContent());
-        verify(messageRepository).findByExchangeIdOrderByTimestampAsc(5L);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Привет!", result.getContent().get(0).getContent());
+        verify(messageRepository).findPageByExchangeId(5L, pageable);
     }
 
     @Test

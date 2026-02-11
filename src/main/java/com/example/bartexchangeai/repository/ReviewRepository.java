@@ -1,6 +1,8 @@
 package com.example.bartexchangeai.repository;
 
 import com.example.bartexchangeai.model.user.Review;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -32,4 +34,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT COUNT(r) > 0 FROM Review r WHERE r.id = :reviewId AND r.reviewer.username = :username")
     boolean existsByIdAndReviewerUsername(@Param("reviewId") Long reviewId, @Param("username") String username);
+
+    Page<Review> findByReviewerId(Long reviewerId, Pageable pageable);
+
+    Page<Review> findByReviewedUserId(Long reviewedUserId, Pageable pageable);
+
+    Page<Review> findByExchangeId(Long exchangeId, Pageable pageable);
 }

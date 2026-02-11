@@ -44,7 +44,11 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/", "/dashboard", "/status/**").permitAll()
                 .requestMatchers("/web/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                // Public read: catalog data only
+                .requestMatchers(HttpMethod.GET, "/api/offers/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/groups/**").permitAll()
+                // Everything else requires authentication
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers

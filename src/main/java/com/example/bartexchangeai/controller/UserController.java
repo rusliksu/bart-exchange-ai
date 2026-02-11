@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -43,8 +41,8 @@ public class UserController {
 
     @GetMapping("/rating/{minRating}")
     @Operation(summary = "Get users by minimum rating")
-    public List<UserDto> getUsersByRating(@PathVariable Float minRating) {
-        return userService.findByMinRating(minRating);
+    public Page<UserDto> getUsersByRating(@PathVariable Float minRating, Pageable pageable) {
+        return userService.findByMinRating(minRating, pageable);
     }
 
     @PostMapping
