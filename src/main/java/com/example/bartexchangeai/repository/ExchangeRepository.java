@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 @Repository
@@ -27,4 +29,7 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
 
     @Query("SELECT e FROM Exchange e ORDER BY e.date DESC")
     List<Exchange> findAllOrderByDateDesc();
+
+    @Query("SELECT COUNT(e) > 0 FROM Exchange e WHERE e.id = :exchangeId AND (e.initiator.username = :username OR e.participant.username = :username)")
+    boolean existsByIdAndParticipantUsername(@Param("exchangeId") Long exchangeId, @Param("username") String username);
 }

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,10 +57,6 @@ public class RecommendationServiceImpl implements RecommendationService {
         List<Exchange> userExchanges = exchangeRepository.findByUserId(userId);
         Double avgRating = reviewRepository.findAverageRatingByReviewedUserId(userId);
 
-        Set<Long> userOfferIds = userOffers.stream()
-                .map(Offer::getId)
-                .collect(Collectors.toSet());
-
         List<Offer> candidates = offerRepository.findByStatus(OfferStatus.ACTIVE).stream()
                 .filter(o -> !o.getUser().getId().equals(userId))
                 .limit(maxCandidates)
@@ -69,8 +66,17 @@ public class RecommendationServiceImpl implements RecommendationService {
             return Collections.emptyList();
         }
 
+        Set<Long> candidateOwnerIds = candidates.stream()
+                .map(o -> o.getUser().getId())
+                .collect(Collectors.toSet());
+        Map<Long, Double> ownerRatings = reviewRepository.findAverageRatingsByUserIds(candidateOwnerIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Double) row[1]
+                ));
+
         String systemPrompt = buildSystemPrompt();
-        String userPrompt = buildUserPrompt(user, userOffers, userExchanges, avgRating, candidates);
+        String userPrompt = buildUserPrompt(user, userOffers, userExchanges, avgRating, candidates, ownerRatings);
 
         try {
             List<RecommendationDto> recommendations = chatClient.prompt()
@@ -104,7 +110,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     private String buildUserPrompt(User user, List<Offer> userOffers,
                                    List<Exchange> exchanges, Double avgRating,
-                                   List<Offer> candidates) {
+                                   List<Offer> candidates, Map<Long, Double> ownerRatings) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("## User Profile\n");
@@ -132,7 +138,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         sb.append("\n## Candidate Offers to Rank\n");
         for (Offer c : candidates) {
-            Double ownerRating = reviewRepository.findAverageRatingByReviewedUserId(c.getUser().getId());
+            Double ownerRating = ownerRatings.get(c.getUser().getId());
             sb.append("- ID: ").append(c.getId())
                     .append(", Title: ").append(c.getTitle())
                     .append(", Category: ").append(c.getCategory().getName())

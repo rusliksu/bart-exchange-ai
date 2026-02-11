@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 @Repository
@@ -19,4 +21,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     
     @Query("SELECT m FROM Message m WHERE m.exchange.id = :exchangeId ORDER BY m.timestamp DESC")
     List<Message> findByExchangeIdOrderByTimestampDesc(Long exchangeId);
+
+    @Query("SELECT COUNT(m) > 0 FROM Message m WHERE m.id = :messageId AND m.sender.username = :username")
+    boolean existsByIdAndSenderUsername(@Param("messageId") Long messageId, @Param("username") String username);
 }

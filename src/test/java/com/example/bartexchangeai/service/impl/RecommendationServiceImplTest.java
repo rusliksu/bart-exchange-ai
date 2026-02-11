@@ -26,6 +26,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -76,7 +77,8 @@ class RecommendationServiceImplTest {
         when(exchangeRepository.findByUserId(1L)).thenReturn(Collections.emptyList());
         when(reviewRepository.findAverageRatingByReviewedUserId(1L)).thenReturn(4.0);
         when(offerRepository.findByStatus(OfferStatus.ACTIVE)).thenReturn(List.of(candidateOffer));
-        when(reviewRepository.findAverageRatingByReviewedUserId(2L)).thenReturn(3.5);
+        when(reviewRepository.findAverageRatingsByUserIds(Set.of(2L)))
+                .thenReturn(Collections.singletonList(new Object[]{2L, 3.5}));
 
         List<RecommendationDto> expected = List.of(
                 new RecommendationDto(10L, "Laptop", "Electronics", 0.9, "Good match")
@@ -156,7 +158,8 @@ class RecommendationServiceImplTest {
         when(exchangeRepository.findByUserId(1L)).thenReturn(Collections.emptyList());
         when(reviewRepository.findAverageRatingByReviewedUserId(1L)).thenReturn(null);
         when(offerRepository.findByStatus(OfferStatus.ACTIVE)).thenReturn(List.of(candidateOffer));
-        when(reviewRepository.findAverageRatingByReviewedUserId(2L)).thenReturn(null);
+        when(reviewRepository.findAverageRatingsByUserIds(Set.of(2L)))
+                .thenReturn(Collections.emptyList());
 
         when(chatClient.prompt()).thenReturn(requestSpec);
         when(requestSpec.system(anyString())).thenReturn(requestSpec);

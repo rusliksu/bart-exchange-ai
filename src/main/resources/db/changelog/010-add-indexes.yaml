@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-add-indexes
+      author: ruslan
+      changes:
+        - createIndex:
+            tableName: offers
+            indexName: idx_offers_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: offers
+            indexName: idx_offers_user_id
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            tableName: exchanges
+            indexName: idx_exchanges_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: exchanges
+            indexName: idx_exchanges_initiator_id
+            columns:
+              - column:
+                  name: initiator_id
+        - createIndex:
+            tableName: exchanges
+            indexName: idx_exchanges_participant_id
+            columns:
+              - column:
+                  name: participant_id
+        - createIndex:
+            tableName: messages
+            indexName: idx_messages_exchange_id
+            columns:
+              - column:
+                  name: exchange_id
+        - createIndex:
+            tableName: messages
+            indexName: idx_messages_sender_id
+            columns:
+              - column:
+                  name: sender_id
+        - createIndex:
+            tableName: reviews
+            indexName: idx_reviews_reviewed_user_id
+            columns:
+              - column:
+                  name: reviewed_user_id
+        - createIndex:
+            tableName: reviews
+            indexName: idx_reviews_reviewer_id
+            columns:
+              - column:
+                  name: reviewer_id

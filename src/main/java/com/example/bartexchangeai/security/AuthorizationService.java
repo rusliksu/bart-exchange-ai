@@ -15,33 +15,22 @@ public class AuthorizationService {
     private final ReviewRepository reviewRepository;
 
     public boolean isUserSelf(Long userId, String username) {
-        return userRepository.findById(userId)
-                .map(u -> u.getUsername().equals(username))
-                .orElse(false);
+        return userRepository.existsByIdAndUsername(userId, username);
     }
 
     public boolean isOfferOwner(Long offerId, String username) {
-        return offerRepository.findById(offerId)
-                .map(o -> o.getUser().getUsername().equals(username))
-                .orElse(false);
+        return offerRepository.existsByIdAndUserUsername(offerId, username);
     }
 
     public boolean isExchangeParticipant(Long exchangeId, String username) {
-        return exchangeRepository.findById(exchangeId)
-                .map(e -> e.getInitiator().getUsername().equals(username)
-                        || e.getParticipant().getUsername().equals(username))
-                .orElse(false);
+        return exchangeRepository.existsByIdAndParticipantUsername(exchangeId, username);
     }
 
     public boolean isMessageSender(Long messageId, String username) {
-        return messageRepository.findById(messageId)
-                .map(m -> m.getSender().getUsername().equals(username))
-                .orElse(false);
+        return messageRepository.existsByIdAndSenderUsername(messageId, username);
     }
 
     public boolean isReviewAuthor(Long reviewId, String username) {
-        return reviewRepository.findById(reviewId)
-                .map(r -> r.getReviewer().getUsername().equals(username))
-                .orElse(false);
+        return reviewRepository.existsByIdAndReviewerUsername(reviewId, username);
     }
 }
