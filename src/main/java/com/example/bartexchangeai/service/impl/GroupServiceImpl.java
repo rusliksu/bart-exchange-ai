@@ -8,11 +8,13 @@ import com.example.bartexchangeai.model.group.Group;
 import com.example.bartexchangeai.repository.GroupRepository;
 import com.example.bartexchangeai.service.GroupService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -57,7 +59,9 @@ public class GroupServiceImpl implements GroupService {
             throw new DuplicateResourceException("Группа с name=" + groupDto.getName() + " уже существует");
         }
         Group group = groupMapper.toEntity(groupDto);
-        return groupMapper.toDto(groupRepository.save(group));
+        Group saved = groupRepository.save(group);
+        log.info("Group created: id={}, name={}", saved.getId(), saved.getName());
+        return groupMapper.toDto(saved);
     }
 
     @Override
@@ -67,6 +71,7 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new ResourceNotFoundException("Group", id));
         group.setName(groupDto.getName());
         group.setDescription(groupDto.getDescription());
+        log.info("Group updated: id={}", id);
         return groupMapper.toDto(groupRepository.save(group));
     }
 
@@ -77,5 +82,6 @@ public class GroupServiceImpl implements GroupService {
             throw new ResourceNotFoundException("Group", id);
         }
         groupRepository.deleteById(id);
+        log.warn("Group deleted: id={}", id);
     }
 }

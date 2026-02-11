@@ -8,11 +8,13 @@ import com.example.bartexchangeai.model.user.User;
 import com.example.bartexchangeai.repository.UserRepository;
 import com.example.bartexchangeai.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -55,7 +57,9 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateResourceException("Пользователь с email=" + userDto.getEmail() + " уже существует");
         }
         User user = userMapper.toEntity(userDto);
-        return userMapper.toDto(userRepository.save(user));
+        User saved = userRepository.save(user);
+        log.info("User created: id={}, username={}", saved.getId(), saved.getUsername());
+        return userMapper.toDto(saved);
     }
 
     @Override
@@ -76,6 +80,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         // rating обновляется только через отзывы, не через API
+        log.info("User updated: id={}", id);
         return userMapper.toDto(userRepository.save(user));
     }
 
@@ -86,5 +91,6 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException("User", id);
         }
         userRepository.deleteById(id);
+        log.warn("User deleted: id={}", id);
     }
 }

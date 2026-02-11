@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 /**
@@ -19,6 +20,7 @@ public class MessageDto {
     private Long id;
     
     @NotBlank(message = "Текст сообщения обязателен")
+    @Size(max = 5000, message = "Сообщение не должно превышать 5000 символов")
     private String content;
     
     private LocalDateTime timestamp;

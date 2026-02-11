@@ -9,6 +9,7 @@ import com.example.bartexchangeai.repository.MessageRepository;
 import com.example.bartexchangeai.repository.UserRepository;
 import com.example.bartexchangeai.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -61,7 +63,9 @@ public class MessageServiceImpl implements MessageService {
         if (message.getTimestamp() == null) {
             message.setTimestamp(LocalDateTime.now());
         }
-        return messageMapper.toDto(messageRepository.save(message));
+        Message saved = messageRepository.save(message);
+        log.info("Message created: id={}, sender={}, exchange={}", saved.getId(), messageDto.getSenderId(), messageDto.getExchangeId());
+        return messageMapper.toDto(saved);
     }
 
     @Override
@@ -71,5 +75,6 @@ public class MessageServiceImpl implements MessageService {
             throw new ResourceNotFoundException("Message", id);
         }
         messageRepository.deleteById(id);
+        log.warn("Message deleted: id={}", id);
     }
 }
