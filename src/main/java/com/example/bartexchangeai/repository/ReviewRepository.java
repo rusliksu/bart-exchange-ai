@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.repository.query.Param;
+
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -23,4 +26,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByReviewedUserIdOrderByIdDesc(Long userId);
     
     boolean existsByExchangeIdAndReviewerId(Long exchangeId, Long reviewerId);
+
+    @Query("SELECT r.reviewedUser.id, AVG(r.rating) FROM Review r WHERE r.reviewedUser.id IN :userIds GROUP BY r.reviewedUser.id")
+    List<Object[]> findAverageRatingsByUserIds(@Param("userIds") Collection<Long> userIds);
+
+    @Query("SELECT COUNT(r) > 0 FROM Review r WHERE r.id = :reviewId AND r.reviewer.username = :username")
+    boolean existsByIdAndReviewerUsername(@Param("reviewId") Long reviewId, @Param("username") String username);
 }
