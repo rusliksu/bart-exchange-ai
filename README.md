@@ -1,5 +1,12 @@
 # BartExchangeAI
 
+![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.4-brightgreen?logo=springboot)
+![Spring AI](https://img.shields.io/badge/Spring%20AI-1.0.0-green?logo=spring)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-130%2B-brightgreen)
+
 REST API for a barter exchange platform built with Spring Boot.
 
 ## Tech Stack
