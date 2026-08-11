@@ -1,155 +1,132 @@
 # BartExchangeAI
 
-REST API for a barter exchange platform built with Spring Boot.
+[![Java 21](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot 3.5](https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?style=flat&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![CI](https://github.com/rusliksu/bart-exchange-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/rusliksu/bart-exchange-ai/actions/workflows/ci.yml)
 
-## Tech Stack
+AI-assisted barter exchange backend built with Spring Boot. The project combines a JWT-secured REST API, a relational exchange domain, and an LLM-backed recommendation flow that can run in a mock mode during development.
 
-- **Java 21**, **Spring Boot 3.5**
-- **Spring AI** + OpenAI (GPT-4o-mini) for recommendations
-- **Spring Security** + JWT authentication
-- **Spring Data JPA** + Hibernate
-- **PostgreSQL** (prod) / **H2** (dev)
-- **Liquibase** for database migrations
-- **MapStruct** for DTO mapping
-- **Swagger/OpenAPI** (springdoc)
-- **JUnit 5** + **Mockito** (130+ tests)
-- **Docker Compose** for local PostgreSQL
+> No hosted demo is advertised: run the stack locally and inspect the API through Swagger UI.
 
-## Features
+## What this project demonstrates
 
-- **AI-powered offer recommendations** (personalized per user)
-- User management with rating system
-- Offer listings with categories and groups
-- Exchange workflow (create, complete, cancel)
-- Messaging between exchange participants
-- Review system with average rating calculation
-- JWT-based authentication (register/login)
-- Paginated API responses
-- Global error handling with structured error responses
-- Swagger UI for API exploration
+| Area | Implementation |
+| --- | --- |
+| Backend API | Spring MVC controllers for users, offers, categories, groups, exchanges, messages, reviews, authentication, and recommendations |
+| AI integration | Spring AI `ChatClient` ranks active offers using the user's offers, exchange history, ratings, and candidate-owner ratings |
+| Persistence | PostgreSQL with Liquibase migrations in production; H2 with Hibernate DDL in the development profile |
+| Security | Stateless Spring Security with JWT authentication, BCrypt password hashing, method security, and public catalog reads |
+| Performance | Caffeine cache for recommendation results with a 10-minute expiry and bounded candidate/result lists |
+| Delivery | Docker Compose, GitHub Actions build/test pipeline, JAR artifact, GHCR image, and OWASP dependency analysis |
 
-## Getting Started
+## Architecture
 
-### Prerequisites
+```mermaid
+flowchart LR
+    Client[REST client / Swagger / Web UI] --> Security[Spring Security + JWT]
+    Security --> API[REST controllers]
+    API --> Services[Service layer]
+    Services --> DB[(PostgreSQL + Liquibase)]
+    Services --> Cache[(Caffeine cache)]
+    Services --> Recommendation[Recommendation service]
+    Recommendation --> Context[User context + active offers]
+    Recommendation --> ChatClient[Spring AI ChatClient]
+    ChatClient --> OpenAI[OpenAI GPT-4o-mini]
+    OpenAI --> Recommendation
+```
 
-- Java 21+
-- Gradle 8+ (or use included wrapper)
+The recommendation endpoint is `GET /api/recommendations/user/{userId}`. In production mode it gathers bounded domain context, asks the model for structured `RecommendationDto` results, limits the response to five items, and caches the result by user. In development mode the same interface is backed by a mock implementation, so the application starts without an API key.
 
-### Run with H2 (development)
+## Quick start: development mode
+
+Requirements: Java 21 and either Gradle 8+ or the included Gradle wrapper.
 
 ```bash
+git clone https://github.com/rusliksu/bart-exchange-ai.git
+cd bart-exchange-ai
 ./gradlew bootRun
 ```
 
-The app starts at `http://localhost:8080` with an in-memory H2 database and sample data.
+On Windows:
 
-### Run with PostgreSQL (production)
-
-```bash
-# Start PostgreSQL
-docker compose up -d
-
-# Run the app with prod profile
-./gradlew bootRun --args='--spring.profiles.active=prod'
+```powershell
+.\gradlew.bat bootRun
 ```
 
-### Run Tests
+The default `dev` profile uses an in-memory H2 database, creates the schema with Hibernate, and enables mock recommendations. No OpenAI key or PostgreSQL instance is required.
+
+Useful local surfaces:
+
+- Application: <http://localhost:8080>
+- Swagger UI: <http://localhost:8080/swagger-ui.html>
+- Health: <http://localhost:8080/actuator/health>
+- Public active offers: `GET /api/offers/active`
+
+To try authenticated endpoints, register and log in through `POST /api/auth/register` and `POST /api/auth/login`, then use the returned JWT as a Bearer token in Swagger UI.
+
+## PostgreSQL and real AI mode
+
+Copy `.env.example` to `.env`, set a real database password, a production JWT secret, and `OPENAI_API_KEY`, then start the complete stack:
+
+```bash
+docker compose up --build
+```
+
+The Compose profile runs PostgreSQL 16 and the application with the `prod` profile. Production startup validates the Liquibase schema and enables the OpenAI-backed recommendation implementation.
+
+## Recommendation flow
+
+1. Load the user's offers, exchange history, and average review rating.
+2. Select up to 50 active offers from other users and collect their average ratings.
+3. Build a structured prompt with the user context and candidate offers.
+4. Ask Spring AI for a JSON array of `offerId`, title, category, score, and reason.
+5. Keep the top five results and cache them for ten minutes.
+
+Configuration is intentionally bounded:
+
+| Property | Default | Purpose |
+| --- | ---: | --- |
+| `app.recommendation.mock-enabled` | `true` in dev / `false` in prod | Select mock or OpenAI implementation |
+| `app.recommendation.max-results` | `5` | Maximum returned recommendations |
+| `app.recommendation.max-candidates` | `50` | Maximum offers sent for ranking |
+| `spring.cache.caffeine.spec` | `maximumSize=100,expireAfterWrite=10m` | Recommendation cache policy |
+| `OPENAI_API_KEY` | empty in dev / required for real AI | Credentials for the OpenAI-backed implementation |
+
+## API surface
+
+| Resource | Base path | Examples |
+| --- | --- | --- |
+| Authentication | `/api/auth` | Register, login |
+| Offers | `/api/offers` | Browse, search, create, update, delete |
+| Categories and groups | `/api/categories`, `/api/groups` | Catalog and membership operations |
+| Exchanges | `/api/exchanges` | Create, complete, cancel |
+| Messages and reviews | `/api/messages`, `/api/reviews` | Exchange communication and ratings |
+| Users | `/api/users` | Profiles, ratings, and administration |
+| Recommendations | `/api/recommendations` | AI-ranked offers for a user |
+
+GET requests for the public catalog are available without authentication. Mutating operations and private domain operations require a JWT.
+
+## Quality gates
 
 ```bash
 ./gradlew test
+./gradlew build
+./gradlew dependencyCheckAnalyze
 ```
 
-## API Endpoints
+The repository currently contains 19 test classes and more than 140 JUnit test methods covering services, controllers, security, and the recommendation integration path. GitHub Actions runs the build and tests on Java 21, publishes the test report and JAR artifact, builds the main-branch Docker image, and runs OWASP Dependency Check.
 
-| Resource          | URL                          | Methods                          |
-|-------------------|------------------------------|----------------------------------|
-| Recommendations   | `/api/recommendations`       | GET personalized offers          |
-| Auth              | `/api/auth`                  | POST register, login             |
-| Users             | `/api/users`                 | GET, POST, PUT, DELETE           |
-| Categories        | `/api/categories`            | GET, POST, PUT, DELETE           |
-| Offers            | `/api/offers`                | GET, POST, PUT, DELETE + search  |
-| Exchanges         | `/api/exchanges`             | GET, POST, PUT, DELETE + complete/cancel |
-| Messages          | `/api/messages`              | GET, POST, DELETE                |
-| Reviews           | `/api/reviews`               | GET, POST, PUT, DELETE + average |
-| Groups            | `/api/groups`                | GET, POST, PUT, DELETE + search  |
+## Project layout
 
-### Authentication
-
-GET endpoints are public. POST/PUT/DELETE require a JWT token:
-
-```bash
-# Register
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"user1","email":"user1@test.com","password":"password123"}'
-
-# Use the returned token
-curl -H "Authorization: Bearer <token>" \
-  -X POST http://localhost:8080/api/offers ...
-```
-
-### AI Recommendations
-
-The platform uses OpenAI GPT-4o-mini to generate personalized offer recommendations based on user's exchange history, preferred categories and ratings.
-
-```bash
-# Get recommendations for user with id=1
-curl http://localhost:8080/api/recommendations/user/1
-```
-
-Response:
-```json
-[
-  {
-    "offerId": 10,
-    "offerTitle": "Vintage Guitar",
-    "categoryName": "Music",
-    "score": 0.95,
-    "reason": "Matches your interest in musical instruments based on previous exchanges"
-  }
-]
-```
-
-**Configuration:**
-
-| Property | Default | Description |
-|----------|---------|-------------|
-| `OPENAI_API_KEY` | — | OpenAI API key (required for prod) |
-| `app.recommendation.mock-enabled` | `true` (dev) / `false` (prod) | Use mock recommendations without API key |
-| `app.recommendation.max-results` | `5` | Max recommendations returned |
-| `app.recommendation.max-candidates` | `50` | Max offers sent to LLM for ranking |
-
-In dev profile, recommendations work in mock mode (no API key needed). For real AI recommendations:
-
-```bash
-OPENAI_API_KEY=sk-... ./gradlew bootRun --args='--app.recommendation.mock-enabled=false'
-```
-
-### Swagger UI
-
-Available at: `http://localhost:8080/swagger-ui.html`
-
-## Project Structure
-
-```
+```text
 src/main/java/com/example/bartexchangeai/
-├── config/          # SecurityConfig, OpenApiConfig, RecommendationConfig, DataInitializer
-├── controller/      # REST controllers (9 + AuthController)
-├── dto/             # Data Transfer Objects + auth DTOs + ErrorResponse
-├── exception/       # Custom exceptions + GlobalExceptionHandler
-├── mapper/          # MapStruct mappers
-├── model/           # JPA entities (User, Offer, Exchange, Message, Review, Category, Group)
+├── config/          # Security, OpenAPI, caching, and recommendation wiring
+├── controller/      # REST and web controllers
+├── dto/             # API payloads, including RecommendationDto
+├── model/           # User, offer, exchange, message, review, category, and group
 ├── repository/      # Spring Data JPA repositories
-├── security/        # JWT provider, filter, UserDetailsService
-└── service/         # Service interfaces + implementations
+├── security/        # JWT provider, filter, and user details service
+└── service/         # Domain services and AI/mock recommendation implementations
 ```
 
-## Dev Credentials (H2 profile)
-
-| User    | Password      | Role  |
-|---------|---------------|-------|
-| alice   | password123   | USER  |
-| bob     | password123   | USER  |
-| charlie | password123   | ADMIN |
-
-H2 Console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:testdb`, user: `sa`)
+The README is intentionally aligned with the running profiles and the current source tree; it does not claim a hosted environment, benchmark numbers, or features that are not present in the repository.
