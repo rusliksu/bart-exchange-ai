@@ -1,12 +1,20 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.4'
+    id 'org.springframework.boot' version '3.5.15'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'org.owasp.dependencycheck' version '11.1.1'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
+
+// Явные пины под CVE: Boot 3.5.15 притягивает версии ниже исправленных.
+// Spring Framework намеренно остаётся 6.2.19 (ветка Boot 3.5.x).
+ext['tomcat.version'] = '10.1.59'
+ext['jackson-bom.version'] = '2.21.7'
+ext['postgresql.version'] = '42.7.12'
+ext['commons-lang3.version'] = '3.18.0'
+ext['log4j2.version'] = '2.25.5'
 
 java {
     toolchain {
@@ -25,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation platform('org.springframework.ai:spring-ai-bom:1.0.0')
+    implementation platform('org.springframework.ai:spring-ai-bom:1.0.7')
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
