@@ -12,6 +12,7 @@ Spring Framework намеренно на 6.2.19: в ветке 6.2 нет фик
 - `./gradlew test` — только тесты.
 - `./gradlew dependencyCheckAnalyze` — OWASP-проверка зависимостей, сборка падает при CVSS ≥ 9.
 - Проверено 25.11.2026 на 12.2.2 с зеркалом NVD: холодный прогон 3м06с, повторный 14с, база в `~/.gradle/dependency-check-data`. Скан работает, гейт CVSS ≥ 9 реально валит сборку. На 11.1.1 задача падала на `Value too long for column URL ... CVE-2026-6786` — это лечится версией плагина и зеркалом, а не кодом проекта.
+- `dependencyCheckAnalyze` кешируется Gradle: после правки подавлений или конфига скана запускай с `--rerun-tasks`, иначе получишь `UP-TO-DATE` и ложно зелёный `BUILD SUCCESSFUL` за секунды.
 - Подавления лежат в `dependency-check-suppressions.xml` и подключены через `suppressionFile`. Все блоки с `until="2027-01-15Z"`: 10 CVE, у которых в наших ветках нет фикса (spring-framework 6.2.19 → 6.2.20, spring-security 6.5.11 → 6.5.12, spring-ai 1.0.9 → 1.0.10, плюс JS в swagger-ui) и путь эксплуатации в этом коде не достижим. Каждое CVE — отдельный `<suppress>`: несколько `<cve>` в одном блоке объединяются по AND и не сработают.
 - `./gradlew bootRun --args='--spring.profiles.active=dev'` — запуск на H2, без внешней БД.
 - `docker compose up -d` — PostgreSQL для прод-профиля.
