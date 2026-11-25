@@ -71,4 +71,5 @@ dependencyCheck {
     formats = ['HTML', 'JSON']
     data.directory = "${System.getProperty('user.home')}/.gradle/dependency-check-data"
     nvd.datafeedUrl = 'https://dependency-check.github.io/DependencyCheck_Builder/nvd_cache/nvdcve-{0}.json.gz'
+    suppressionFile = "${projectDir}/dependency-check-suppressions.xml"
 }
