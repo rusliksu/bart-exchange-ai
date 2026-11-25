@@ -1,15 +1,16 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.15'
+    id 'org.springframework.boot' version '3.5.16'
     id 'io.spring.dependency-management' version '1.1.6'
-    id 'org.owasp.dependencycheck' version '11.1.1'
+    id 'org.owasp.dependencycheck' version '12.2.2'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
-// Явные пины под CVE: Boot 3.5.15 притягивает версии ниже исправленных.
-// Spring Framework намеренно остаётся 6.2.19 (ветка Boot 3.5.x).
+// Пины под CVE: Boot 3.5.16 притягивает версии ниже исправленных.
+// Spring Framework намеренно остаётся в ветке 6.2.x (Boot 3.5.16): фикс двух CVE есть только в 7.0.9,
+// по коду они не достижимы (нет XSLT-вьюх, SSE и WebFlux functional endpoints).
 ext['tomcat.version'] = '10.1.59'
 ext['jackson-bom.version'] = '2.21.7'
 ext['postgresql.version'] = '42.7.12'
@@ -33,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation platform('org.springframework.ai:spring-ai-bom:1.0.7')
+    implementation platform('org.springframework.ai:spring-ai-bom:1.0.9')
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
@@ -44,7 +45,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.9.0'
     implementation 'org.liquibase:liquibase-core'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
@@ -68,4 +69,6 @@ tasks.named('test') {
 dependencyCheck {
     failBuildOnCVSS = 9
     formats = ['HTML', 'JSON']
+    data.directory = "${System.getProperty('user.home')}/.gradle/dependency-check-data"
+    nvd.datafeedUrl = 'https://dependency-check.github.io/DependencyCheck_Builder/nvd_cache/nvdcve-{0}.json.gz'
 }
