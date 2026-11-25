@@ -1,7 +1,7 @@
 # AGENTS.md — BartExchangeAI
 
 REST API бартерной биржи: обмены, группы, офферы, отзывы, рекомендации через Spring AI.
-Java 21, Spring Boot 3.5.15, Gradle, пакет `com.example.bartexchangeai`.
+Java 21, Spring Boot 3.5.16, Gradle, пакет `com.example.bartexchangeai`.
 Spring Framework намеренно на 6.2.19: в ветке 6.2 нет фикса для двух CVE (XsltView, SSE), по коду они не достижимы. Не тянуть Spring 7 и Boot 4 «заодно».
 Проект портфолио-уровня: не тащить сюда enterprise-инфраструктуру без прямой просьбы.
 
@@ -11,7 +11,7 @@ Spring Framework намеренно на 6.2.19: в ветке 6.2 нет фик
 - Первый прогон на чистой машине ~7 минут (Gradle 8.8 и зависимости качаются), повторный — секунды. Долгий `build` — не повод считать его зависшим.
 - `./gradlew test` — только тесты.
 - `./gradlew dependencyCheckAnalyze` — OWASP-проверка зависимостей, сборка падает при CVSS ≥ 9.
-- Актуальное состояние (25.11.2026): задача падает на обновлении базы NVD (`Value too long for column URL ... CVE-2026-6786`), это баг плагина и данных, а не проекта. Без `NVD_API_KEY` в CI обновление длится 40+ минут. Красный `dependencyCheck` проверяй по причине, прежде чем чинить код.
+- Плагин обновлён до 12.2.2, в сборке прописано зеркало NVD (`nvd.datafeedUrl` на dependency-check.github.io) и общий каталог данных. На 11.1.1 задача падала на `Value too long for column URL ... CVE-2026-6786`; на 12.2.2 после апгрейда не перепроверял. Без `NVD_API_KEY` первое обновление длится долго. Красный `dependencyCheck` сначала читай по причине, а не чини код.
 - `./gradlew bootRun --args='--spring.profiles.active=dev'` — запуск на H2, без внешней БД.
 - `docker compose up -d` — PostgreSQL для прод-профиля.
 - Прод-профиль требует `DB_PASSWORD` и `JWT_SECRET` из окружения.
@@ -58,7 +58,7 @@ Spring Framework намеренно на 6.2.19: в ветке 6.2 нет фик
 - Не коммитить, не пушить, не мержить без прямой просьбы.
 - `JwtAuthenticationFilter` не отключать, `permitAll` на новые пути не добавлять «чтобы заработало».
 - `dependencyCheck` не отключать, порог CVSS не поднимать, тесты не глушить.
-- Версии, запинованные в `build.gradle` через `ext`, не откатывать: tomcat 10.1.59, jackson 2.21.7, postgresql 42.7.12, commons-lang3 3.18.0, log4j 2.25.5, Spring AI 1.0.7 — это закрытые CVE, а не вкусовщина.
+- Версии, запинованные в `build.gradle` через `ext`, не откатывать: tomcat 10.1.59, jackson 2.21.7, postgresql 42.7.12, commons-lang3 3.18.0, log4j 2.25.5 — это закрытые CVE, а не вкусовщина. Spring AI приходит из BOM 1.0.9.
 - Пакеты и файлы не переименовывать ради «чистоты».
 - `nul` в корне — артефакт Windows, в коммит не тащить.
 
